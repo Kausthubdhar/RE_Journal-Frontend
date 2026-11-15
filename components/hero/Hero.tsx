@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import dynamic from "next/dynamic";
-import { ArrowUpRight, ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import { CATEGORIES } from "./data";
 import PromptBox from "./PromptBox";
-import MiniPreview from "./MiniPreview";
+import DockTile from "./DockTile";
 import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from "@/lib/gsap";
 
 const CityScene = dynamic(() => import("./CityScene"), { ssr: false });
@@ -163,14 +163,6 @@ export default function Hero() {
         { y: 0, autoAlpha: 1, scale: 1, duration: 0.7, ease: "back.out(2)", stagger: 0.05, delay: 0.15 },
       );
       gsap.fromTo("[data-workspace]", { autoAlpha: 0, x: -8 }, { autoAlpha: 1, x: 0, duration: 0.5 });
-      // mini previews: wipe in left to right, bars grow from the baseline, heat cells scatter in
-      gsap.fromTo(
-        "[data-prev]",
-        { clipPath: "inset(0% 100% 0% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", duration: 1, ease: "power3.out", stagger: 0.06, delay: 0.35 },
-      );
-      gsap.from("[data-prev-bar]", { scaleY: 0, transformOrigin: "50% 100%", duration: 0.8, ease: "expo.out", stagger: 0.02, delay: 0.4 });
-      gsap.from("[data-prev-cell]", { opacity: 0, duration: 0.4, stagger: { each: 0.004, from: "random" }, delay: 0.4 });
     },
     { scope: root, dependencies: [idx] },
   );
@@ -180,11 +172,13 @@ export default function Hero() {
   const next = () => setIdx((i) => (i + 1) % CATEGORIES.length);
 
   // auto-advance only while on screen and the browser tab is visible; it pauses while the mouse is
-  // over the tabs/dock or keyboard focus is inside the tabs
+  // over the tabs/dock, keyboard focus is inside the tabs, or a dock tile is open (tap or keyboard)
   const [hovered, setHovered] = useState(false);
   const [tabFocus, setTabFocus] = useState(false);
+  // a dock tile opened by tap or keyboard also holds the rotation (phones have no hover to pause it)
+  const [tileFocus, setTileFocus] = useState(false);
   const [onScreen, setOnScreen] = useState(true);
-  const auto = onScreen && !hovered && !tabFocus;
+  const auto = onScreen && !hovered && !tabFocus && !tileFocus;
 
   useEffect(() => {
     let inView = true;
@@ -301,6 +295,8 @@ export default function Hero() {
           data-hero-dock
           onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
           onPointerLeave={() => setHovered(false)}
+          onFocus={(e) => setTileFocus(!!e.target.closest("[data-app]"))}
+          onBlur={() => setTileFocus(false)}
           className="relative mx-auto -mt-27.5 w-[min(960px,calc(100%-24px))] sm:-mt-31"
         >
           <div className="rounded-[26px] border border-white/80 bg-white/95 px-4 pb-4 pt-9 shadow-float sm:px-6 sm:pb-6 sm:pt-10">
@@ -325,39 +321,18 @@ export default function Hero() {
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-3 sm:gap-2.5">
-              {cat.apps.map((a) => {
-                const Icon = a.icon;
-                return (
-                  <div
-                    key={cat.key + a.name}
-                    data-app
-                    className="group flex min-w-0 cursor-pointer flex-col gap-3 rounded-2xl border border-line bg-white p-3 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-black/15 hover:shadow-[0_12px_28px_-16px_rgba(14,15,16,0.4)] sm:p-3.5"
-                  >
-                    <div className="flex min-w-0 items-center gap-2.5">
-                      <span
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105"
-                        style={{ background: `color-mix(in oklab, ${a.color} 13%, white)`, color: a.color }}
-                      >
-                        <Icon className="h-4 w-4" strokeWidth={2} />
-                      </span>
-                      <span className="line-clamp-2 min-w-0 flex-1 text-[12.5px] font-medium leading-tight text-ink sm:truncate sm:text-[13.5px]">{a.name}</span>
-                      <ArrowUpRight className="hidden h-3.5 w-3.5 shrink-0 -translate-x-1 text-muted opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block" />
-                    </div>
-                    <div data-prev className="h-10 opacity-90 transition-opacity duration-300 group-hover:opacity-100 sm:h-11">
-                      <MiniPreview kind={a.preview} name={a.name} color={a.color} />
-                    </div>
-                  </div>
-                );
-              })}
+              {cat.apps.map((a) => (
+                <DockTile key={cat.key + a.name} name={a.name} icon={a.icon} color={a.color} preview={a.preview} />
+              ))}
               {cat.apps.length % 3 !== 0 && (
-                <div data-app className="flex min-w-0 cursor-pointer flex-col gap-3 rounded-2xl border border-dashed border-black/15 p-3 text-muted transition-colors hover:border-black/30 hover:text-ink sm:p-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black/4">
-                      <Plus className="h-4 w-4" />
-                    </span>
-                    <span className="truncate text-[12.5px] font-medium sm:text-[13.5px]">New view</span>
+                <div data-app className="flex h-26 min-w-0 cursor-pointer flex-col justify-between rounded-2xl border border-dashed border-black/15 p-3 text-muted transition-colors hover:border-black/30 hover:text-ink sm:h-28 sm:p-3.5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/4">
+                    <Plus className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <div className="text-[13px] font-medium sm:text-[14px]">New view</div>
+                    <div className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.08em]">Build your own</div>
                   </div>
-                  <div className="flex h-10 items-center justify-center rounded-lg border border-dashed border-black/10 text-[11px] sm:h-11">Build your own</div>
                 </div>
               )}
             </div>

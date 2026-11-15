@@ -72,7 +72,7 @@ export default function MiniPreview({ kind, name, color }: { kind: PreviewKind; 
       const area = `${path(pts)} L${W},${H} L0,${H} Z`;
       const [lx, ly] = pts[pts.length - 1];
       return (
-        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" {...common}>
+        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" data-prev-draw {...common}>
           <path d={area} fill={tint(color, 18)} data-prev-fade />
           <path d={path(pts)} fill="none" stroke={color} strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" data-prev-line />
           <circle cx={lx} cy={ly} r="2.4" fill="white" stroke={color} strokeWidth="1.6" vectorEffect="non-scaling-stroke" data-prev-fade />
@@ -86,7 +86,7 @@ export default function MiniPreview({ kind, name, color }: { kind: PreviewKind; 
     const up = fc.map(([x, y], i) => `${x},${r2(y - i * 2.2)}`);
     const dn = fc.map(([x, y], i) => `${x},${r2(y + i * 2.2)}`).reverse();
     return (
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" {...common}>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" data-prev-draw {...common}>
         <path d={`M${up.join(" L")} L${dn.join(" L")} Z`} fill="#2448ff" fillOpacity="0.14" data-prev-fade />
         <line x1={hist[cut][0]} x2={hist[cut][0]} y1="0" y2={H} stroke={color} strokeOpacity="0.2" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
         <path d={path(hist)} fill="none" stroke={color} strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" data-prev-line />
@@ -147,7 +147,7 @@ export default function MiniPreview({ kind, name, color }: { kind: PreviewKind; 
     <svg viewBox="0 0 120 40" {...common}>
       <path d={arc} fill="none" stroke="#e7e6e1" strokeWidth="6" strokeLinecap="round" />
       <path d={arc} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" pathLength={100} strokeDasharray={`${r2(v * 100)} 100`} data-prev-gauge />
-      <line x1="36" y1="36" x2={r2(36 + Math.cos(ang) * 20)} y2={r2(36 - Math.sin(ang) * 20)} stroke="#0e0f10" strokeWidth="2" strokeLinecap="round" data-prev-fade />
+      <line x1="36" y1="36" x2={r2(36 + Math.cos(ang) * 20)} y2={r2(36 - Math.sin(ang) * 20)} stroke="#0e0f10" strokeWidth="2" strokeLinecap="round" data-prev-needle />
       <circle cx="36" cy="36" r="3" fill="#0e0f10" />
       <g transform="translate(76 12)" data-prev-fade>
         <rect width="36" height="5" rx="2.5" fill="#0e0f10" fillOpacity="0.12" />
