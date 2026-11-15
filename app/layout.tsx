@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { INDEXABLE, LIVE_SITE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   title: TITLE,
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
+  // demo copies (Vercel, localhost) stay out of search results; only the real rejournal.in is indexed
+  robots: INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
   openGraph: { type: "website", url: "/", siteName: SITE_NAME, title: TITLE, description: SITE_DESCRIPTION, locale: "en_IN" },
   twitter: { card: "summary_large_image", title: TITLE, description: SITE_DESCRIPTION },
 };
@@ -37,7 +39,7 @@ const JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: SITE_NAME,
-  url: SITE_URL,
+  url: LIVE_SITE_URL,
   description: SITE_DESCRIPTION,
   email: "support@rejournal.in",
   telephone: "+91 84528 32879",
