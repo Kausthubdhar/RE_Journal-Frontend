@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import dynamic from "next/dynamic";
-import { ChevronDown, ChevronLeft, Plus } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Plus } from "lucide-react";
 import { CATEGORIES } from "./data";
 import PromptBox from "./PromptBox";
 import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from "@/lib/gsap";
@@ -286,98 +286,100 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* dock */}
-      <div style={intro(0.8, 80)} className="hero-in relative z-20">
+      {/* dock: a closed card with the asset-class tabs set into its top edge */}
+      <div style={intro(0.8, 80)} className="hero-in relative z-20 pb-6 sm:pb-12">
         <div
           data-hero-dock
           onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
           onPointerLeave={() => setHovered(false)}
-          className="relative mx-auto -mt-27.5 w-[min(940px,calc(100%-24px))] sm:-mt-31"
+          className="relative mx-auto -mt-27.5 w-[min(960px,calc(100%-24px))] sm:-mt-31"
         >
-            {/* tabs ride on top of the dock so they move together on scroll */}
-            <div style={intro(0.9, 20)} className="hero-in absolute inset-x-0 bottom-full mb-2 flex justify-center">
-              <div
-                role="tablist"
-                aria-label="Asset classes"
-                onKeyDown={onTabKey}
-                onFocus={(e) => setTabFocus(e.target.matches(":focus-visible"))}
-                onBlur={() => setTabFocus(false)}
-                className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-full border border-white/70 bg-[#eeeeea]/95 p-1 shadow-float"
-              >
-                {CATEGORIES.map((c, i) => {
-                  const on = i === idx;
-                  return (
-                    <button
-                      key={c.key}
-                      ref={(el) => {
-                        tabRefs.current[i] = el;
-                      }}
-                      id={`hero-tab-${c.key}`}
-                      role="tab"
-                      aria-selected={on}
-                      aria-controls="hero-panel"
-                      tabIndex={on ? 0 : -1}
-                      onClick={() => setIdx(i)}
-                      className={`relative flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 py-1.5 text-[13.5px] transition-all duration-300 ${
-                        on ? "bg-white font-medium text-ink shadow-sm" : "text-ink-2 hover:text-ink"
-                      }`}
-                    >
-                      {on && <TabProgress key={idx} playing={auto} onDone={next} />}
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-          {/* bottom edge fades out via a mask; the wrapper is oversized so the panel's shadow isn't clipped */}
-          <div className="pointer-events-none -mx-12 -mt-12 px-12 pt-12 mask-[linear-gradient(to_top,transparent,black_2.5rem)]">
-          <div className="pointer-events-auto overflow-hidden rounded-t-[22px] border border-b-0 border-white/80 bg-white/95 shadow-float">
-            <div className="flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-black/5">
-                  <ChevronLeft className="h-3.5 w-3.5 text-muted" />
+          <div className="rounded-[26px] border border-white/80 bg-white/95 px-4 pb-4 pt-9 shadow-float sm:px-6 sm:pb-6 sm:pt-10">
+            <div className="flex items-center justify-between gap-3">
+              <span data-workspace className="flex items-center gap-2 rounded-full border border-line bg-bg/70 py-1 pl-1.5 pr-2.5 text-[12.5px] font-medium text-ink-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full" style={{ background: `color-mix(in oklab, ${cat.apps[0].color} 16%, white)` }}>
+                  <span className="h-2 w-2 rounded-full" style={{ background: cat.apps[0].color }} />
                 </span>
-                <span data-workspace className="flex items-center gap-1 rounded-md bg-black/4.5 px-2 py-1 text-[12px] font-medium text-ink-2">
-                  <span className="h-2 w-2 rounded-sm" style={{ background: cat.apps[0].color }} />
-                  {cat.workspace}
-                  <ChevronDown className="h-3 w-3" />
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-1.5" aria-hidden>
+                {cat.workspace}
+                <ChevronDown className="h-3 w-3 text-muted" />
+              </span>
+              <div className="flex items-center gap-2.5">
+                <div className="hidden -space-x-1.5 sm:flex" aria-hidden>
                   {["#2448ff", "#d0613a", "#3c7a5a", "#c4892b"].map((c, i) => (
-                    <span key={c} className="h-5 w-5 rounded-full border-2 border-white text-center text-[8px] leading-4 font-semibold text-white" style={{ background: c }}>
+                    <span key={c} className="h-6 w-6 rounded-full border-2 border-white text-center text-[9px] leading-5 font-semibold text-white" style={{ background: c }}>
                       {["A", "R", "S", "M"][i]}
                     </span>
                   ))}
                 </div>
-                <span className="rounded-md bg-black/4.5 px-2 py-1 text-[12px] font-medium text-ink-2">Share</span>
+                <span className="rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-white">Share</span>
               </div>
             </div>
-            <div className="no-scrollbar flex items-start justify-start gap-4 overflow-x-auto px-5 pb-7 pt-5 sm:justify-center sm:gap-7">
-              <div className="flex w-18 shrink-0 flex-col items-center gap-2">
-                <span className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-dashed border-black/15 bg-white text-muted">
-                  <Plus className="h-5 w-5" />
-                </span>
-                <span className="text-center text-[11px] text-muted">New view</span>
-              </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-3 sm:gap-2.5">
               {cat.apps.map((a) => {
                 const Icon = a.icon;
                 return (
-                  <div key={cat.key + a.name} data-app className="group flex w-19 shrink-0 cursor-pointer flex-col items-center gap-2">
+                  <div
+                    key={cat.key + a.name}
+                    data-app
+                    className="group flex min-w-0 cursor-pointer flex-col items-start gap-2.5 rounded-2xl border border-line bg-white p-3 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-black/15 hover:shadow-[0_10px_24px_-14px_rgba(14,15,16,0.35)] sm:flex-row sm:items-center sm:gap-3 sm:pr-3"
+                  >
                     <span
-                      className="flex h-12 w-12 items-center justify-center rounded-[14px] text-white shadow-[0_6px_16px_-6px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105"
-                      style={{ background: `linear-gradient(160deg, ${a.color}, ${a.color}dd)` }}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 sm:h-11 sm:w-11"
+                      style={{ background: `color-mix(in oklab, ${a.color} 13%, white)`, color: a.color }}
                     >
-                      <Icon className="h-5 w-5" strokeWidth={1.8} />
+                      <Icon className="h-5 w-5" strokeWidth={1.9} />
                     </span>
-                    <span className="text-center text-[11px] leading-tight text-ink-2">{a.name}</span>
+                    <span className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-ink sm:truncate sm:text-[14px]">{a.name}</span>
+                    <ArrowUpRight className="hidden h-4 w-4 shrink-0 -translate-x-1 text-muted opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block" />
                   </div>
                 );
               })}
+              {cat.apps.length % 3 !== 0 && (
+                <div data-app className="flex min-w-0 cursor-pointer flex-col items-start gap-2.5 rounded-2xl border border-dashed border-black/15 p-3 text-muted transition-colors hover:border-black/30 hover:text-ink sm:flex-row sm:items-center sm:gap-3 sm:pr-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/4 sm:h-11 sm:w-11">
+                    <Plus className="h-5 w-5" />
+                  </span>
+                  <span className="truncate text-[13px] font-medium sm:text-[14px]">New view</span>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* tabs sit on the card's top edge, so they always move with it */}
+          <div style={intro(0.9, 20)} className="hero-in absolute inset-x-0 top-0 flex -translate-y-1/2 justify-center px-3">
+            <div
+              role="tablist"
+              aria-label="Asset classes"
+              onKeyDown={onTabKey}
+              onFocus={(e) => setTabFocus(e.target.matches(":focus-visible"))}
+              onBlur={() => setTabFocus(false)}
+              className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-full border border-line bg-[#eeeeea] p-1 shadow-[0_8px_20px_-10px_rgba(14,15,16,0.3)]"
+            >
+              {CATEGORIES.map((c, i) => {
+                const on = i === idx;
+                return (
+                  <button
+                    key={c.key}
+                    ref={(el) => {
+                      tabRefs.current[i] = el;
+                    }}
+                    id={`hero-tab-${c.key}`}
+                    role="tab"
+                    aria-selected={on}
+                    aria-controls="hero-panel"
+                    tabIndex={on ? 0 : -1}
+                    onClick={() => setIdx(i)}
+                    className={`relative flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 py-1.5 text-[13.5px] transition-all duration-300 ${
+                      on ? "bg-white font-medium text-ink shadow-sm" : "text-ink-2 hover:text-ink"
+                    }`}
+                  >
+                    {on && <TabProgress key={idx} playing={auto} onDone={next} />}
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

@@ -57,7 +57,7 @@ export default function Stats() {
   );
 
   return (
-    <section ref={root} id="about" className="relative pt-24 sm:pt-36">
+    <section ref={root} id="about" className="relative pt-10 sm:pt-14">
       {/* marquee */}
       <div className="relative mb-20 overflow-hidden border-y border-line py-4 sm:mb-28">
         <div className="mask-[linear-gradient(to_right,transparent,black_6rem,black_calc(100%-6rem),transparent)]">
