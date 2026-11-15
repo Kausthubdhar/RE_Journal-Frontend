@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Logo, { SocialIcon } from "./Logo";
 import { gsap, prefersReducedMotion, scrollToId, useGSAP } from "@/lib/gsap";
@@ -121,21 +122,21 @@ export default function Nav() {
           >
             <SocialIcon name="linkedin" />
           </a>
-          <a href={LINKS.signIn} className="hidden rounded-full px-3.5 py-2 text-[14px] font-medium text-ink sm:block hover:bg-black/4.5">
+          <Link href={LINKS.signIn} className="hidden rounded-full px-3.5 py-2 text-[14px] font-medium text-ink sm:block hover:bg-black/4.5">
             Log in
-          </a>
+          </Link>
           <button
             onClick={() => go("contact")}
             className="hidden cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-[14px] font-medium shadow-sm transition hover:border-black/20 md:block"
           >
             Book your demo
           </button>
-          <a
+          <Link
             href={LINKS.signUp}
             className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-white transition hover:bg-black/80"
           >
             Get started
-          </a>
+          </Link>
           <button
             className="ml-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full hover:bg-black/5 lg:hidden"
             onClick={() => setOpen((o) => !o)}
@@ -158,9 +159,14 @@ export default function Nav() {
             {l.label}
           </button>
         ))}
-        <button data-item onClick={() => go("contact")} className="mt-2 w-full cursor-pointer rounded-xl border border-line bg-white px-4 py-3 text-[15px] font-medium">
-          Book your demo
-        </button>
+        <div data-item className="mt-2 grid grid-cols-2 gap-2">
+          <Link href={LINKS.signIn} className="rounded-xl border border-line bg-white px-4 py-3 text-center text-[15px] font-medium">
+            Log in
+          </Link>
+          <button onClick={() => go("contact")} className="cursor-pointer rounded-xl border border-line bg-white px-4 py-3 text-[15px] font-medium">
+            Book your demo
+          </button>
+        </div>
       </div>
     </header>
   );
