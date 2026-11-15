@@ -21,7 +21,10 @@ const CAREER = [
   { when: "Today", title: "Founder, RE Journal", body: "Quantitative forecasting for India's commercial and residential markets." },
 ];
 
-/** Editorial founder feature: tall portrait with name overlay + story card with a scroll-drawn career timeline. */
+/**
+ * Founder profile card. The portrait is shown small and circular on purpose: the source photo is
+ * low-resolution, and at ~240px it stays crisp even on retina screens.
+ */
 function FounderSpotlight() {
   const root = useRef<HTMLDivElement>(null);
 
@@ -29,18 +32,19 @@ function FounderSpotlight() {
     () => {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // portrait wipes in from the bottom, then keeps a gentle parallax
-        gsap.fromTo(
-          "[data-frame]",
-          { clipPath: "inset(18% 0% 0% 0% round 32px)" },
-          { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: "[data-frame]", start: "top 85%" } },
-        );
-        gsap.to("[data-portrait]", {
-          yPercent: -12,
-          ease: "none",
-          scrollTrigger: { trigger: "[data-frame]", start: "top bottom", end: "bottom top", scrub: true },
+        // portrait pops in, the dashed orbit turns slowly, the blue arc sweeps with scroll
+        gsap.from("[data-avatar]", {
+          scale: 0.8,
+          autoAlpha: 0,
+          duration: 1.2,
+          ease: "expo.out",
+          scrollTrigger: { trigger: "[data-avatar]", start: "top 85%" },
         });
-        reveal("[data-name] > *", "[data-frame]", { y: 30, stagger: 0.08, duration: 1.1 }, "top 70%");
+        gsap.to("[data-orbit-ring]", { rotate: 360, duration: 50, repeat: -1, ease: "none" });
+        const sweep = { trigger: "[data-profile]", start: "top 85%", end: "bottom 30%", scrub: true };
+        gsap.fromTo("[data-arc-wrap]", { rotate: -90 }, { rotate: 150, ease: "none", scrollTrigger: sweep });
+        gsap.fromTo("[data-arc]", { strokeDashoffset: 100 }, { strokeDashoffset: 62, ease: "none", scrollTrigger: sweep });
+        reveal("[data-profile-text] > *", "[data-profile]", { y: 24, stagger: 0.08, duration: 1 }, "top 75%");
         reveal("[data-story] > *", "[data-story]", { y: 30, stagger: 0.07, duration: 1 }, "top 80%");
         // timeline: the accent line draws with scroll, each step lights up as it is reached
         gsap.fromTo(
@@ -63,77 +67,86 @@ function FounderSpotlight() {
   );
 
   return (
-    <div ref={root} className="mt-24 grid items-stretch gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-6">
-      {/* portrait */}
-      <figure data-frame className="relative min-h-125 overflow-hidden rounded-4xl bg-[#5d5d63] lg:min-h-160">
-        {/* 114% tall so the parallax never reveals an edge */}
-        <div data-portrait className="absolute inset-x-0 top-0 h-[114%]">
-          <Image
-            src={portrait}
-            alt="Dr. Subash Bhola, founder of RE Journal"
-            fill
-            placeholder="blur"
-            sizes="(min-width: 1024px) 560px, 100vw"
-            className="object-cover object-[50%_16%]"
-          />
-        </div>
-        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/90 via-ink/25 via-45% to-transparent" />
-        <span className="absolute left-5 top-5 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-[12px] font-medium text-white backdrop-blur-md">
-          PhD · Economics
-        </span>
-        <figcaption data-name className="absolute inset-x-0 bottom-0 p-7 text-white sm:p-9">
-          <span className="block text-[12px] font-medium uppercase tracking-[0.16em] text-white/70">Meet the founder</span>
-          <span className="mt-3 block text-[clamp(2.2rem,4vw,3.4rem)] font-semibold leading-none tracking-[-0.04em]">Dr. Subash Bhola</span>
-          <span className="serif mt-2 block text-[clamp(1.3rem,2vw,1.7rem)] italic text-white/85">Founder, RE Journal</span>
-        </figcaption>
-      </figure>
-
-      {/* story */}
-      <div data-story className="flex flex-col rounded-4xl border border-line bg-white p-8 sm:p-12">
-        <span className="eyebrow">Two decades of research</span>
-        <h3 className="mt-5 text-[clamp(1.9rem,3vw,2.6rem)] font-semibold leading-[1.05] tracking-[-0.035em]">
-          Pioneering Indian real estate research <span className="serif font-normal italic">since the 2000s.</span>
-        </h3>
-        <p className="mt-5 max-w-130 text-[16px] leading-relaxed text-muted">
-          With 20+ years in research and advisory and a PhD in economics, Dr. Bhola specialises in quantitative forecasting
-          for commercial real estate.
-        </p>
-
-        <div data-tl className="relative mt-10">
-          <div className="absolute bottom-3 left-1.75 top-3 w-px bg-line" />
-          <div data-tl-line className="absolute bottom-3 left-1.75 top-3 w-px origin-top bg-accent" />
-          <ol className="flex flex-col gap-7">
-            {CAREER.map((c) => (
-              <li key={c.when} data-step className="relative pl-9">
-                <span data-dot className="absolute left-0 top-1 h-3.75 w-3.75 rounded-full border-2 border-accent bg-accent" />
-                <div className="font-mono text-[11.5px] uppercase tracking-[0.12em] text-muted">{c.when}</div>
-                <div className="mt-1 text-[18px] font-semibold tracking-tight">{c.title}</div>
-                {c.body && <p className="mt-1 text-[14.5px] leading-relaxed text-muted">{c.body}</p>}
-                {c.tags && (
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {c.tags.map((t) => (
-                      <span key={t} className="rounded-full border border-line bg-bg px-2.5 py-1 text-[12px] font-medium text-ink-2">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <div className="mt-auto grid grid-cols-3 gap-4 border-t border-line pt-6 max-lg:mt-10 lg:pt-7">
-          {[
-            ["20+", "years in research"],
-            ["~15", "years at JLL"],
-            ["PhD", "Economics"],
-          ].map(([k, l]) => (
-            <div key={l}>
-              <div className="text-[30px] font-semibold tracking-[-0.03em]">{k}</div>
-              <div className="text-[13px] text-muted">{l}</div>
+    <div ref={root} className="mt-24 overflow-hidden rounded-4xl border border-line bg-white">
+      <div className="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        {/* profile */}
+        <div data-profile className="relative flex flex-col items-center border-b border-line bg-[radial-gradient(120%_70%_at_50%_0%,var(--accent-soft),transparent_70%)] px-8 pb-10 pt-14 text-center sm:px-12 lg:border-b-0 lg:border-r lg:pt-16">
+          <div data-avatar className="relative h-50 w-50 sm:h-60 sm:w-60">
+            {/* dashed orbit + scroll-swept accent arc */}
+            <div data-orbit-ring className="absolute -inset-6 rounded-full border border-dashed border-ink/15">
+              <span className="absolute left-1/2 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_0_4px_var(--accent-soft)]" />
             </div>
-          ))}
+            <svg data-arc-wrap viewBox="0 0 100 100" className="absolute -left-3 -top-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] overflow-visible" aria-hidden>
+              <circle data-arc cx="50" cy="50" r="49" fill="none" stroke="var(--accent)" strokeWidth="1.2" strokeLinecap="round" pathLength={100} strokeDasharray="100" strokeDashoffset="62" />
+            </svg>
+            <div className="relative h-full w-full overflow-hidden rounded-full bg-[#5d5d63] shadow-[0_24px_60px_-20px_rgba(14,15,16,0.45)] ring-4 ring-white">
+              <Image
+                src={portrait}
+                alt="Dr. Subash Bhola, founder of RE Journal"
+                fill
+                placeholder="blur"
+                sizes="240px"
+                className="object-cover object-[50%_12%]"
+              />
+            </div>
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-line bg-white px-3 py-1.5 text-[12px] font-medium shadow-sm">
+              PhD · Economics
+            </span>
+          </div>
+
+          <div data-profile-text className="mt-10 flex flex-col items-center">
+            <span className="eyebrow">Meet the founder</span>
+            <h3 className="mt-3 text-[clamp(2rem,3.2vw,2.6rem)] font-semibold leading-none tracking-[-0.04em]">Dr. Subash Bhola</h3>
+            <span className="serif mt-2 text-[1.35rem] italic text-ink-2">Founder, RE Journal</span>
+            <div className="mt-8 grid w-full max-w-90 grid-cols-3 divide-x divide-line rounded-2xl border border-line bg-bg/60">
+              {[
+                ["20+", "years in research"],
+                ["~15", "years at JLL"],
+                ["PhD", "Economics"],
+              ].map(([k, l]) => (
+                <div key={l} className="px-2 py-3.5">
+                  <div className="text-[24px] font-semibold tracking-[-0.03em]">{k}</div>
+                  <div className="text-[12px] leading-tight text-muted">{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* story */}
+        <div data-story className="flex flex-col p-8 sm:p-12">
+          <span className="eyebrow">Two decades of research</span>
+          <h3 className="mt-5 text-[clamp(1.9rem,3vw,2.6rem)] font-semibold leading-[1.05] tracking-[-0.035em]">
+            Pioneering Indian real estate research <span className="serif font-normal italic">since the 2000s.</span>
+          </h3>
+          <p className="mt-5 max-w-130 text-[16px] leading-relaxed text-muted">
+            With 20+ years in research and advisory and a PhD in economics, Dr. Bhola specialises in quantitative forecasting
+            for commercial real estate.
+          </p>
+
+          <div data-tl className="relative mt-10">
+            <div className="absolute bottom-3 left-1.75 top-3 w-px bg-line" />
+            <div data-tl-line className="absolute bottom-3 left-1.75 top-3 w-px origin-top bg-accent" />
+            <ol className="flex flex-col gap-7">
+              {CAREER.map((c) => (
+                <li key={c.when} data-step className="relative pl-9">
+                  <span data-dot className="absolute left-0 top-1 h-3.75 w-3.75 rounded-full border-2 border-accent bg-accent" />
+                  <div className="font-mono text-[11.5px] uppercase tracking-[0.12em] text-muted">{c.when}</div>
+                  <div className="mt-1 text-[18px] font-semibold tracking-tight">{c.title}</div>
+                  {c.body && <p className="mt-1 text-[14.5px] leading-relaxed text-muted">{c.body}</p>}
+                  {c.tags && (
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {c.tags.map((t) => (
+                        <span key={t} className="rounded-full border border-line bg-bg px-2.5 py-1 text-[12px] font-medium text-ink-2">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </div>
     </div>
