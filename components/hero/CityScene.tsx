@@ -626,6 +626,73 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     const camera = new THREE.PerspectiveCamera(30, 2, 0.1, 300);
     const target = new THREE.Vector3(0, 3.6, 0);
 
+    // ---- auto-framing: each scene is fitted to the visible window of the stage ----
+    // Camera sits at target + OFFSET * view.s (fixed viewing angle); view.s and the target move per scene.
+    const OFFSET = new THREE.Vector3(31, 19, 37).sub(target);
+    const view = { s: 1, tx: 0, ty: 3.6, tz: 0 };
+    let viewTween: gsap.core.Tween | null = null;
+    const sceneBox = new THREE.Box3();
+    const probe = new THREE.PerspectiveCamera(30, 2, 0.1, 300);
+    const corner = new THREE.Vector3();
+    const look = new THREE.Vector3();
+
+    /** Visible window of the stage in NDC: the prompt box covers the top, tabs + dock cover the bottom. */
+    const band = () => {
+      const h = mount.clientHeight || 600;
+      // phones have no side callouts, so scenes may use the full width there
+      return { top: 1 - (2 * 40) / h, bottom: -1 + (2 * 125) / h, side: camera.aspect < 1.2 ? 0.98 : 0.86 };
+    };
+    /** Projected NDC extent of the scene's bounding box for a camera distance and target. */
+    const extent = (sc: number, tx: number, ty: number, tz: number) => {
+      probe.aspect = camera.aspect;
+      probe.updateProjectionMatrix();
+      look.set(tx, ty, tz);
+      probe.position.copy(OFFSET).multiplyScalar(sc).add(look);
+      probe.lookAt(look);
+      probe.updateMatrixWorld();
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      for (let i = 0; i < 8; i++) {
+        corner
+          .set(i & 1 ? sceneBox.max.x : sceneBox.min.x, i & 2 ? sceneBox.max.y : sceneBox.min.y, i & 4 ? sceneBox.max.z : sceneBox.min.z)
+          .project(probe);
+        minX = Math.min(minX, corner.x); maxX = Math.max(maxX, corner.x);
+        minY = Math.min(minY, corner.y); maxY = Math.max(maxY, corner.y);
+      }
+      return { minX, maxX, minY, maxY };
+    };
+    /** Closest camera distance (and target height) at which the scene fits the window, centred in it. */
+    const solveView = () => {
+      if (sceneBox.isEmpty()) return { s: 1, tx: 0, ty: 3.6, tz: 0 };
+      const b = band();
+      const half = (b.top - b.bottom) / 2;
+      const mid = (b.top + b.bottom) / 2;
+      const c = sceneBox.getCenter(new THREE.Vector3());
+      let ty = c.y;
+      let sc = 1;
+      for (let pass = 0; pass < 3; pass++) {
+        let lo = 0.45, hi = 2.2;
+        for (let k = 0; k < 18; k++) {
+          const m = (lo + hi) / 2;
+          const e = extent(m, c.x, ty, c.z);
+          const fits = (e.maxY - e.minY) / 2 <= half && Math.max(-e.minX, e.maxX) <= b.side;
+          if (fits) hi = m;
+          else lo = m;
+        }
+        sc = hi;
+        // nudge the target so the scene's projected centre lands on the window's centre
+        const e = extent(sc, c.x, ty, c.z);
+        const worldPerNdc = OFFSET.length() * sc * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+        ty += ((e.maxY + e.minY) / 2 - mid) * worldPerNdc;
+      }
+      return { s: sc, tx: c.x, ty, tz: c.z };
+    };
+    const reframe = (animate: boolean) => {
+      viewTween?.kill();
+      const next = solveView();
+      if (animate && !prefersReducedMotion()) viewTween = gsap.to(view, { ...next, duration: 1.8, ease: "power3.inOut" });
+      else Object.assign(view, next);
+    };
+
     scene.add(new THREE.HemisphereLight("#ffffff", "#d9d4ca", 0.9));
     const sun = new THREE.DirectionalLight("#fff3e2", 2.4);
     sun.position.set(18, 30, 14);
@@ -706,6 +773,9 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       b.finish();
       const entry: Live = { group: b.group, spinners: b.spinners };
       const items = b.group.children;
+      b.group.updateMatrixWorld(true);
+      sceneBox.setFromObject(b.group);
+      reframe(!!old);
       scene.add(b.group);
       live.add(entry);
       current = entry;
@@ -737,7 +807,6 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     show(shown.current);
 
     // sizing
-    let fit = 1;
     let dirty = true;
     const resize = () => {
       const w = mount.clientWidth;
@@ -745,8 +814,8 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       if (!w || !h) return;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      fit = Math.min(1.45, Math.max(1, 1.9 / camera.aspect));
       camera.updateProjectionMatrix();
+      reframe(false);
       dirty = true;
     };
     const ro = new ResizeObserver(resize);
@@ -768,7 +837,6 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
     io.observe(mount);
 
-    const base = new THREE.Vector3(31, 19, 37).multiplyScalar(1.0);
     const up = new THREE.Vector3(0, 1, 0);
     const camPos = new THREE.Vector3();
     const clock = new THREE.Clock();
@@ -798,8 +866,9 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       if (!moving && !busy && !spinning && !dirty) return;
       dirty = false;
 
-      camPos.copy(base).applyAxisAngle(up, cx * 0.14).multiplyScalar(fit);
-      camPos.y -= cy * 2.2;
+      target.set(view.tx, view.ty, view.tz);
+      camPos.copy(OFFSET).applyAxisAngle(up, cx * 0.14).multiplyScalar(view.s).add(target);
+      camPos.y -= cy * 2.2 * view.s;
       camera.position.copy(camPos);
       camera.lookAt(target);
       if (busy) renderer.shadowMap.needsUpdate = true;
@@ -823,6 +892,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
 
     return () => {
       cancelAnimationFrame(raf);
+      viewTween?.kill();
       ro.disconnect();
       io.disconnect();
       window.removeEventListener("pointermove", onMove);
