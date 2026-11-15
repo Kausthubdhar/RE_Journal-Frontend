@@ -40,5 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# claude code (per-user local settings)
-.claude/settings.local.json
+# local AI-assistant files (not part of the site)
+.claude/
+AGENTS.md
+CLAUDE.md
