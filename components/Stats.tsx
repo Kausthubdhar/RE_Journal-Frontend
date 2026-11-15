@@ -60,6 +60,7 @@ export default function Stats() {
     <section ref={root} id="about" className="relative pt-24 sm:pt-36">
       {/* marquee */}
       <div className="relative mb-20 overflow-hidden border-y border-line py-4 sm:mb-28">
+        <div className="mask-[linear-gradient(to_right,transparent,black_6rem,black_calc(100%-6rem),transparent)]">
         <div className="marquee-track flex w-max gap-10 whitespace-nowrap">
           {[...CITIES, ...CITIES].map((c, i) => (
             <span key={i} className="flex items-center gap-10 text-[15px] text-muted">
@@ -68,8 +69,7 @@ export default function Stats() {
             </span>
           ))}
         </div>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-linear-to-r from-bg" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-linear-to-l from-bg" />
+        </div>
       </div>
 
       <div className="mx-auto max-w-310 px-5 sm:px-8">

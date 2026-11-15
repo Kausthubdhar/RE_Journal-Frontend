@@ -259,9 +259,11 @@ export default function Hero() {
           aria-labelledby={`hero-tab-${cat.key}`}
           className="relative mx-auto -mt-16 h-[clamp(420px,54vw,720px)] max-w-370 origin-top"
         >
-          <ScenePoster hidden={sceneReady} />
-          {use3D && <CityScene active={cat.key} onReady={() => setSceneReady(true)} />}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-b from-bg to-transparent" />
+          {/* the scene fades in at the top with a mask, so the page's own background shows through (no painted band) */}
+          <div className="absolute inset-0 mask-[linear-gradient(to_bottom,transparent,black_6rem)]">
+            <ScenePoster hidden={sceneReady} />
+            {use3D && <CityScene active={cat.key} onReady={() => setSceneReady(true)} />}
+          </div>
 
           {/* callouts */}
           <div key={cat.key} className="pointer-events-none absolute inset-0 hidden md:block">
@@ -328,7 +330,9 @@ export default function Hero() {
               </div>
             </div>
 
-          <div className="overflow-hidden rounded-t-[22px] border border-b-0 border-white/80 bg-white/95 shadow-float">
+          {/* bottom edge fades out via a mask; the wrapper is oversized so the panel's shadow isn't clipped */}
+          <div className="pointer-events-none -mx-12 -mt-12 px-12 pt-12 mask-[linear-gradient(to_top,transparent,black_2.5rem)]">
+          <div className="pointer-events-auto overflow-hidden rounded-t-[22px] border border-b-0 border-white/80 bg-white/95 shadow-float">
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-md bg-black/5">
@@ -374,9 +378,9 @@ export default function Hero() {
               })}
             </div>
           </div>
+          </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-10 bg-linear-to-t from-bg to-transparent" />
     </section>
   );
 }
