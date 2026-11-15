@@ -768,7 +768,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
     io.observe(mount);
 
-    const base = new THREE.Vector3(31, 19, 37).multiplyScalar(1.22);
+    const base = new THREE.Vector3(31, 19, 37).multiplyScalar(1.0);
     const up = new THREE.Vector3(0, 1, 0);
     const camPos = new THREE.Vector3();
     const clock = new THREE.Clock();

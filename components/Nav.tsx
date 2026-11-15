@@ -17,20 +17,49 @@ export const NAV_LINKS = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("top");
   const sheet = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLElement>(null);
+  const links = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
 
   useGSAP(() => {
     if (prefersReducedMotion()) return;
     gsap.from(bar.current, { y: -30, autoAlpha: 0, duration: 1, ease: "expo.out" });
   });
 
+  // glass bar once scrolled + which section is under the reading line (40% down the screen)
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 30);
-    on();
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrolled(window.scrollY > 30);
+      const line = window.innerHeight * 0.4;
+      let current = NAV_LINKS[0].id;
+      for (const l of NAV_LINKS) {
+        const el = document.getElementById(l.id);
+        if (el && el.getBoundingClientRect().top <= line) current = l.id;
+      }
+      setActive(current);
+    };
+    const on = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    window.addEventListener("resize", on);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", on);
+      window.removeEventListener("resize", on);
+    };
   }, []);
+
+  // slide the highlight pill under the active link
+  useEffect(() => {
+    const el = links.current[active];
+    if (el) setPill({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [active]);
 
   useEffect(() => {
     if (!sheet.current) return;
@@ -56,12 +85,25 @@ export default function Nav() {
           <Logo />
         </button>
 
-        <ul className="hidden items-center gap-1 lg:flex">
+        <ul className="relative hidden items-center gap-1 lg:flex">
+          {pill && (
+            <li
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 rounded-full bg-black/6 transition-[left,width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={{ left: pill.left, width: pill.width }}
+            />
+          )}
           {NAV_LINKS.map((l) => (
             <li key={l.id}>
               <button
+                ref={(el) => {
+                  links.current[l.id] = el;
+                }}
                 onClick={() => go(l.id)}
-                className="cursor-pointer rounded-full px-3.5 py-1.5 text-[14px] text-ink-2 transition-colors hover:bg-black/4.5 hover:text-ink"
+                aria-current={active === l.id ? "true" : undefined}
+                className={`relative cursor-pointer rounded-full px-3.5 py-1.5 text-[14px] transition-colors hover:text-ink ${
+                  active === l.id ? "text-ink" : "text-ink-2"
+                }`}
               >
                 {l.label}
               </button>

@@ -257,7 +257,7 @@ export default function Hero() {
           id="hero-panel"
           role="tabpanel"
           aria-labelledby={`hero-tab-${cat.key}`}
-          className="relative mx-auto -mt-16 h-[clamp(400px,50vw,640px)] max-w-370 origin-top"
+          className="relative mx-auto -mt-16 h-[clamp(420px,54vw,720px)] max-w-370 origin-top"
         >
           <ScenePoster hidden={sceneReady} />
           {use3D && <CityScene active={cat.key} onReady={() => setSceneReady(true)} />}

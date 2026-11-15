@@ -4,36 +4,18 @@ import { useRef } from "react";
 import { ArrowRight, Building2, Store, Warehouse, House, Landmark, type LucideIcon } from "lucide-react";
 import { gsap, reveal, useGSAP } from "@/lib/gsap";
 import SectionHeading from "./SectionHeading";
+import IsoScene, { type IsoKind } from "./IsoScene";
 import { LINKS } from "@/lib/site";
 
-type P = { name: string; desc: string; icon: LucideIcon; bg: string; ink: string; skyline: number[] };
+type P = { name: string; desc: string; icon: LucideIcon; bg: string; ink: string; scene: IsoKind };
 
 const PRODUCTS: P[] = [
-  { name: "Office", desc: "Commercial office spaces and business centres for companies of all sizes.", icon: Building2, bg: "#e7ebff", ink: "#2448ff", skyline: [5, 8, 12, 9, 14, 7, 10, 6] },
-  { name: "Retail", desc: "Prime retail spaces and shopping centres in high-traffic locations.", icon: Store, bg: "#ffe9de", ink: "#c2532c", skyline: [3, 4, 4, 6, 6, 4, 3, 5] },
-  { name: "Warehousing", desc: "Modern industrial warehouses and logistics storage facilities.", icon: Warehouse, bg: "#e5ece8", ink: "#2f6a4d", skyline: [3, 3, 3, 3, 4, 4, 3, 3] },
-  { name: "Residential", desc: "Premium residential properties and luxury housing developments.", icon: House, bg: "#f4ecdd", ink: "#9a6a22", skyline: [6, 9, 7, 11, 8, 10, 6, 7] },
-  { name: "Mortgage", desc: "Competitive mortgage services and flexible financing solutions.", icon: Landmark, bg: "#efe7f6", ink: "#7a46a6", skyline: [2, 3, 4, 5, 7, 9, 11, 14] },
+  { name: "Office", desc: "Commercial office spaces and business centres for companies of all sizes.", icon: Building2, bg: "#e7ebff", ink: "#2448ff", scene: "office" },
+  { name: "Retail", desc: "Prime retail spaces and shopping centres in high-traffic locations.", icon: Store, bg: "#ffe9de", ink: "#c2532c", scene: "retail" },
+  { name: "Warehousing", desc: "Modern industrial warehouses and logistics storage facilities.", icon: Warehouse, bg: "#e5ece8", ink: "#2f6a4d", scene: "warehousing" },
+  { name: "Residential", desc: "Premium residential properties and luxury housing developments.", icon: House, bg: "#f4ecdd", ink: "#9a6a22", scene: "residential" },
+  { name: "Mortgage", desc: "Competitive mortgage services and flexible financing solutions.", icon: Landmark, bg: "#efe7f6", ink: "#7a46a6", scene: "mortgage" },
 ];
-
-function Skyline({ values, color }: { values: number[]; color: string }) {
-  const max = 14;
-  return (
-    <svg viewBox="0 0 160 70" className="h-full w-full" preserveAspectRatio="none">
-      {values.map((v, i) => {
-        const h = (v / max) * 64;
-        return (
-          <g key={i}>
-            <rect data-sky x={i * 20 + 2} y={70 - h} width="16" height={h} rx="2" fill={color} opacity={0.12 + (i % 3) * 0.08} />
-            {Array.from({ length: Math.floor(h / 8) }).map((_, k) => (
-              <rect key={k} x={i * 20 + 6} y={70 - h + 4 + k * 8} width="8" height="3" rx="1" fill={color} opacity="0.25" />
-            ))}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 export default function Solutions() {
   const root = useRef<HTMLElement>(null);
@@ -121,8 +103,8 @@ export default function Solutions() {
                 </div>
                 <h3 className="mt-6 text-[clamp(2.4rem,4vw,3.2rem)] font-semibold leading-none tracking-[-0.04em]">{p.name}</h3>
                 <p className="mt-3 max-w-75 text-[15px] leading-relaxed text-ink-2">{p.desc}</p>
-                <div className="mt-auto h-32.5 w-full transition-transform duration-700 group-hover:scale-[1.04]">
-                  <Skyline values={p.skyline} color={p.ink} />
+                <div className="mt-auto h-40 w-full origin-bottom transition-transform duration-700 group-hover:scale-[1.05] sm:h-48">
+                  <IsoScene kind={p.scene} ink={p.ink} />
                 </div>
                 <a href={LINKS.product(p.name)} aria-label={`View ${p.name} details`} className="mt-4 inline-flex items-center gap-2 text-[14px] font-medium" style={{ color: p.ink }}>
                   View details
