@@ -147,13 +147,16 @@ html.lenis body {
   scrollbar-width: none;
 }
 
-/* keyboard focus: visible ring everywhere, never on mouse click */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-.bg-ink :focus-visible {
-  outline-color: #fff;
+/* keyboard focus: visible ring everywhere, never on mouse click.
+   In the base layer so a component's own outline-* utility (e.g. a text field) can override it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .bg-ink :focus-visible {
+    outline-color: #fff;
+  }
 }
 
 /* hero intro: CSS-only so the hero paints before JS (fill "backwards" leaves transforms to GSAP afterwards) */

@@ -48,7 +48,7 @@ export default function PromptBox() {
         e.preventDefault();
         setSent(true);
       }}
-      className="relative z-30 mx-auto mt-8 w-[min(580px,calc(100%-32px))] rounded-2xl border border-line bg-white p-3 shadow-float"
+      className="relative z-30 mx-auto mt-8 w-[min(580px,calc(100%-32px))] rounded-2xl border border-line bg-white p-3 shadow-float transition-[border-color,box-shadow] duration-300 has-[textarea:focus]:border-accent/40 has-[textarea:focus]:shadow-[0_0_0_4px_var(--accent-soft),0_8px_24px_-6px_rgba(14,15,16,0.1),0_24px_60px_-20px_rgba(14,15,16,0.18)]"
     >
       <label htmlFor="ask" className="sr-only">
         Ask the market
