@@ -2,23 +2,26 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChartColumn, SlidersHorizontal, FlaskConical, BadgeCheck, Radio, Database, Headset, ChevronDown, LayoutGrid, Search } from "lucide-react";
-import { gsap, reveal, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { gsap, prefersReducedMotion, reveal, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import SectionHeading from "./SectionHeading";
 
 const FEATURES = [
   {
     icon: ChartColumn,
     title: "Interactive charts",
+    short: "Charts",
     body: "Visualise complex market data with dynamic bar charts, line graphs and heat maps for at-a-glance trend analysis.",
   },
   {
     icon: SlidersHorizontal,
     title: "Advanced filters",
+    short: "Filters",
     body: "Drill down to neighbourhood level and filter by property type, timeframe, price point and key economic indicators.",
   },
   {
     icon: FlaskConical,
     title: "Scientific forecasting",
+    short: "Forecasts",
     body: "Econometric models built on historical data project market movements, rental yields and property appreciation.",
   },
 ];
@@ -87,6 +90,76 @@ function LineChart({ horizon }: { horizon: number }) {
   );
 }
 
+const TOUR_STEP = 5; // seconds per feature in the mobile tour
+
+/**
+ * Phones: the mockup can't stay pinned beside the feature list, so a compact tab bar above it walks
+ * through the features (auto-advancing while the mockup is on screen) and the mockup highlights each.
+ */
+function MobileTour({ active, onSelect }: { active: number; onSelect: (i: number) => void }) {
+  const root = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLSpanElement>(null);
+  const caption = useRef<HTMLParagraphElement>(null);
+  const [inView, setInView] = useState(false);
+  const select = useRef(onSelect);
+  useEffect(() => {
+    select.current = onSelect;
+  });
+
+  // auto-advance only while the tour + mockup are on screen
+  useEffect(() => {
+    const el = root.current?.parentElement;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.45 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useGSAP(
+    () => {
+      if (!bar.current || prefersReducedMotion()) return;
+      gsap.fromTo(caption.current, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" });
+      const t = gsap.fromTo(
+        bar.current,
+        { scaleX: 0 },
+        { scaleX: 1, duration: TOUR_STEP, ease: "none", paused: !inView, onComplete: () => select.current((active + 1) % FEATURES.length) },
+      );
+      return () => t.kill();
+    },
+    { dependencies: [active, inView], revertOnUpdate: true },
+  );
+
+  const f = FEATURES[active];
+  return (
+    <div ref={root} className="mb-5 lg:hidden">
+      <div role="tablist" aria-label="Dashboard features" className="grid grid-cols-3 gap-1 rounded-2xl border border-white/10 bg-white/5 p-1">
+        {FEATURES.map((x, i) => {
+          const Icon = x.icon;
+          const on = i === active;
+          return (
+            <button
+              key={x.title}
+              role="tab"
+              aria-selected={on}
+              onClick={() => onSelect(i)}
+              className={`relative flex cursor-pointer items-center justify-center gap-1.5 overflow-hidden rounded-xl px-2 py-2.5 text-[13px] font-medium transition-colors duration-300 ${
+                on ? "bg-white text-ink" : "text-white/60"
+              }`}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              {x.short}
+              {on && <span ref={bar} className="absolute inset-x-3 bottom-1 h-0.5 origin-left scale-x-0 rounded-full bg-accent" aria-hidden />}
+            </button>
+          );
+        })}
+      </div>
+      <p ref={caption} aria-live="polite" className="mt-3 min-h-[4.5em] text-[14.5px] leading-relaxed text-white/65">
+        <span className="font-medium text-white">{f.title}.</span> {f.body}
+      </p>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
@@ -95,12 +168,16 @@ export default function Dashboard() {
 
   useGSAP(
     () => {
-      gsap.utils.toArray<HTMLElement>("[data-feature]").forEach((el, i) => {
-        ScrollTrigger.create({
-          trigger: el,
-          start: "top 60%",
-          end: "bottom 40%",
-          onToggle: (s) => s.isActive && setActive(i),
+      // desktop: the pinned mockup follows the feature being read; phones use MobileTour instead
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 1024px)", () => {
+        gsap.utils.toArray<HTMLElement>("[data-feature]").forEach((el, i) => {
+          ScrollTrigger.create({
+            trigger: el,
+            start: "top 60%",
+            end: "bottom 40%",
+            onToggle: (s) => s.isActive && setActive(i),
+          });
         });
       });
       reveal("[data-mock]", "[data-mock]", { y: 80, rotateX: 12, duration: 1.4 });
@@ -151,17 +228,19 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-16 grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:gap-16">
-          {/* mock */}
+          {/* mock (min-w-0 lets the swipeable filter row scroll instead of widening the grid) */}
+          <div className="min-w-0">
+          <MobileTour active={active} onSelect={setActive} />
           <div className="lg:sticky lg:top-27.5 lg:h-fit lg:[@media(max-height:920px)]:top-23" style={{ perspective: 1200 }}>
             <div data-mock className="overflow-hidden rounded-[22px] bg-white text-ink shadow-[0_40px_120px_-30px_rgba(36,72,255,0.45)]">
               <div className="flex items-center gap-2 border-b border-line px-4 py-3">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-                <div className="ml-3 flex flex-1 items-center gap-2 rounded-md bg-black/4 px-2.5 py-1 text-[11px] text-muted">
-                  <Search className="h-3 w-3" /> app.rejournal.in / office / mumbai
+                <div className="ml-3 flex min-w-0 flex-1 items-center gap-2 rounded-md bg-black/4 px-2.5 py-1 text-[11px] text-muted">
+                  <Search className="h-3 w-3 shrink-0" /> <span className="truncate">app.rejournal.in / office / mumbai</span>
                 </div>
-                <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">Illustrative data</span>
+                <span className="shrink-0 rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">Illustrative data</span>
               </div>
               <div className="flex">
                 <aside className="hidden w-13 flex-col items-center gap-3 border-r border-line py-4 sm:flex">
@@ -172,9 +251,9 @@ export default function Dashboard() {
                   ))}
                 </aside>
                 <div className="min-w-0 flex-1 p-4 sm:p-5">
-                  <div className={`flex flex-wrap gap-1.5 rounded-xl p-1 ${ring(1)}`}>
+                  <div className={`no-scrollbar flex gap-1.5 overflow-x-auto rounded-xl p-1 sm:flex-wrap ${ring(1)}`}>
                     {["City: Mumbai", "Asset: Office", "Grade A", "Submarket: BKC", "2019 – 2030"].map((f) => (
-                      <span key={f} className="flex items-center gap-1 rounded-lg border border-line bg-white px-2.5 py-1 text-[11.5px] font-medium">
+                      <span key={f} className="flex shrink-0 items-center gap-1 rounded-lg border border-line bg-white px-2.5 py-1 text-[11.5px] font-medium">
                         {f} <ChevronDown className="h-3 w-3 text-muted" />
                       </span>
                     ))}
@@ -209,7 +288,7 @@ export default function Dashboard() {
                         ))}
                       </div>
                     </div>
-                    <div className="mt-2 h-42.5 [@media(max-height:920px)]:h-30">
+                    <div className="mt-2 h-28 sm:h-42.5 [@media(max-height:920px)]:h-30">
                       <LineChart horizon={horizon} />
                     </div>
                   </div>
@@ -237,8 +316,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* features */}
-          <div className="flex flex-col">
+          </div>
+
+          {/* features (desktop; phones get the MobileTour above the mockup) */}
+          <div className="hidden flex-col lg:flex">
             {FEATURES.map((f, i) => {
               const Icon = f.icon;
               const on = active === i;
