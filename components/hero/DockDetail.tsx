@@ -98,7 +98,7 @@ export default function DockDetail({
       if (prefersReducedMotion()) return focusClose();
       const q = gsap.utils.selector(root);
       const t = gsap.timeline({ defaults: { ease: "expo.out" } });
-      t.fromTo(root.current, { clipPath: tileInset() }, { clipPath: "inset(0px 0px 0px 0px round 20px)", duration: 0.7, ease: "expo.inOut" }, 0)
+      t.fromTo(root.current, { clipPath: tileInset() }, { clipPath: "inset(0px 0px 0px 0px round 26px)", duration: 0.7, ease: "expo.inOut" }, 0)
         .from(q("[data-in]"), { y: 12, autoAlpha: 0, duration: 0.6, stagger: 0.05 }, 0.3);
       addChartEntrance(t, q, 0.4);
       // focus only once the header is visible: hidden (autoAlpha 0) elements drop focus
@@ -138,15 +138,13 @@ export default function DockDetail({
       ref={root}
       role="dialog"
       aria-label={`${app.name} preview`}
-      className="absolute inset-0 z-10 flex flex-col rounded-[20px] border border-line bg-white p-4 shadow-[0_24px_60px_-28px_rgba(14,15,16,0.45)]"
+      className="absolute inset-0 z-10 flex flex-col rounded-[26px] border border-line bg-white px-4 pb-4 pt-9 sm:px-6 sm:pb-5 sm:pt-10"
       style={{ ["--tile" as string]: app.color }}
     >
       <div data-in className="flex items-center gap-3">
-        <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: `color-mix(in oklab, ${app.color} 13%, white)`, color: app.color }}
-        >
-          <Icon className="h-5 w-5" strokeWidth={1.9} />
+        <span className="flex shrink-0 flex-col items-center gap-1.5">
+          <Icon className="h-6 w-6 text-ink" strokeWidth={1.6} />
+          <span className="h-0.75 w-6 rounded-full" style={{ background: app.color }} />
         </span>
         <div className="min-w-0 flex-1">
           <div className="truncate text-[15.5px] font-semibold tracking-tight sm:text-[17px]">{app.name}</div>

@@ -77,32 +77,32 @@ export default function DockTile({ name, icon: Icon, color, preview, onOpen }: P
       onClick={(e) => onOpen(e.currentTarget)}
       onKeyDown={onKeyDown}
       style={{ ["--tile" as string]: color }}
-      className="group relative h-26 min-w-0 cursor-pointer overflow-hidden rounded-2xl border border-line bg-white transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tile)_35%,white)] hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--tile)_70%,black)] focus-visible:border-[color-mix(in_oklab,var(--tile)_45%,white)] sm:h-28"
+      className="group relative h-28 w-36 min-w-0 shrink-0 snap-start cursor-pointer overflow-hidden rounded-2xl border border-line bg-white transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 sm:w-auto sm:flex-1 hover:border-[color-mix(in_oklab,var(--tile)_35%,white)] hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--tile)_70%,black)] focus-visible:border-[color-mix(in_oklab,var(--tile)_45%,white)]"
     >
       {/* cursor spotlight in the app's colour */}
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(180px_circle_at_var(--mx,50%)_var(--my,50%),color-mix(in_oklab,var(--tile)_14%,transparent),transparent_70%)]" />
 
       {/* resting face */}
-      <div data-rest className="absolute inset-0 flex flex-col justify-between p-3 sm:p-3.5">
-        <span
-          className="flex h-10 w-10 items-center justify-center rounded-xl"
-          style={{ background: `color-mix(in oklab, ${color} 13%, white)`, color }}
-        >
-          <Icon className="h-5 w-5" strokeWidth={1.9} />
+      <div data-rest className="absolute inset-0 flex flex-col justify-between p-3.5">
+        {/* bare icon with a colour bar; the bar stretches on hover */}
+        <span className="flex flex-col items-start gap-2">
+          <Icon className="h-5.5 w-5.5 text-ink" strokeWidth={1.6} />
+          <span data-bar className="h-0.75 w-5 rounded-full transition-[width] duration-500 ease-out group-hover:w-10" style={{ background: color }} />
         </span>
         <div className="min-w-0">
-          <div className="truncate text-[13px] font-medium text-ink sm:text-[14px]">{name}</div>
-          <div className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted">{KIND_LABEL[preview]}</div>
+          <div className="line-clamp-2 text-[13px] font-medium leading-tight text-ink">{name}</div>
+          <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted">{KIND_LABEL[preview]}</div>
         </div>
       </div>
 
       {/* preview face */}
-      <div data-peek className="invisible absolute inset-0 flex flex-col gap-2 p-3 opacity-0 sm:p-3.5">
+      <div data-peek className="invisible absolute inset-0 flex flex-col gap-2 p-3 opacity-0">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md" style={{ background: `color-mix(in oklab, ${color} 13%, white)`, color }}>
-            <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+          <span className="flex shrink-0 flex-col items-center gap-1">
+            <Icon className="h-4 w-4 text-ink" strokeWidth={1.8} />
+            <span className="h-0.5 w-3 rounded-full" style={{ background: color }} />
           </span>
-          <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink sm:text-[13px]">{name}</span>
+          <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">{name}</span>
           <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted" />
         </div>
         <div className="min-h-0 flex-1">

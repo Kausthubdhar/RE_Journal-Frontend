@@ -147,6 +147,20 @@ export default function Hero() {
     { scope: root },
   );
 
+  // phones: dock row scroll progress (written straight to the DOM, no re-render per scroll)
+  const row = useRef<HTMLDivElement>(null);
+  const rowThumb = useRef<HTMLDivElement>(null);
+  const onRowScroll = () => {
+    const r = row.current;
+    const t = rowThumb.current;
+    if (!r || !t) return;
+    const frac = Math.min(1, r.clientWidth / r.scrollWidth);
+    const max = r.scrollWidth - r.clientWidth;
+    const p = max > 0 ? r.scrollLeft / max : 0;
+    t.style.width = `${frac * 100}%`;
+    t.style.transform = `translateX(${p * (1 / frac - 1) * 100}%)`;
+  };
+
   // per-category transitions (dock apps are already visible from the server render on first mount)
   const shownIdx = useRef(idx);
   useGSAP(
@@ -158,11 +172,15 @@ export default function Hero() {
       );
       if (shownIdx.current === idx) return;
       shownIdx.current = idx;
+      // tiles glide in from the right one after another, then each colour bar draws itself
+      row.current?.scrollTo({ left: 0 });
+      onRowScroll();
       gsap.fromTo(
         "[data-app]",
-        { y: 18, autoAlpha: 0, scale: 0.8 },
-        { y: 0, autoAlpha: 1, scale: 1, duration: 0.7, ease: "back.out(2)", stagger: 0.05, delay: 0.15 },
+        { x: 48, autoAlpha: 0 },
+        { x: 0, autoAlpha: 1, duration: 0.8, ease: "expo.out", stagger: 0.06, delay: 0.1 },
       );
+      gsap.fromTo("[data-bar]", { scaleX: 0 }, { scaleX: 1, transformOrigin: "0% 50%", duration: 0.6, ease: "power3.out", stagger: 0.06, delay: 0.45 });
       gsap.fromTo("[data-workspace]", { autoAlpha: 0, x: -8 }, { autoAlpha: 1, x: 0, duration: 0.5 });
     },
     { scope: root, dependencies: [idx] },
@@ -303,7 +321,10 @@ export default function Hero() {
           onBlur={() => setTileFocus(false)}
           className="relative mx-auto -mt-27.5 w-[min(960px,calc(100%-24px))] sm:-mt-31"
         >
-          <div className="rounded-[26px] border border-white/80 bg-white/95 px-4 pb-4 pt-9 shadow-float sm:px-6 sm:pb-6 sm:pt-10">
+          <div
+            data-open={detail ? "true" : undefined}
+            className="relative rounded-[26px] border border-white/80 bg-white/95 px-4 pb-4 pt-9 shadow-float transition-[min-height] duration-500 ease-out data-open:min-h-84 sm:px-6 sm:pb-6 sm:pt-10 sm:data-open:min-h-62"
+          >
             <div className="flex items-center justify-between gap-3">
               <span data-workspace className="flex items-center gap-2 rounded-full border border-line bg-bg/70 py-1 pl-1.5 pr-2.5 text-[12.5px] font-medium text-ink-2">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full" style={{ background: `color-mix(in oklab, ${cat.apps[0].color} 16%, white)` }}>
@@ -324,7 +345,12 @@ export default function Hero() {
               </div>
             </div>
 
-            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-3 sm:gap-2.5">
+            {/* one row: swipe on phones (snap + peeking next tile), six across on desktop */}
+            <div
+              ref={row}
+              onScroll={onRowScroll}
+              className="no-scrollbar -mx-4 mt-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mt-5 sm:snap-none sm:gap-2.5 sm:overflow-visible sm:px-0 sm:pb-0"
+            >
               {cat.apps.map((a) => (
                 <DockTile
                   key={cat.key + a.name}
@@ -335,21 +361,30 @@ export default function Hero() {
                   onOpen={(from) => setDetail({ app: a, from })}
                 />
               ))}
-              {cat.apps.length % 3 !== 0 && (
-                <div data-app className="flex h-26 min-w-0 cursor-pointer flex-col justify-between rounded-2xl border border-dashed border-black/15 p-3 text-muted transition-colors hover:border-black/30 hover:text-ink sm:h-28 sm:p-3.5">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/4">
-                    <Plus className="h-5 w-5" />
+              {cat.apps.length < 6 && (
+                <div data-app className="group h-28 w-36 min-w-0 shrink-0 snap-start cursor-pointer rounded-2xl border border-dashed border-black/15 text-muted transition-colors hover:border-black/30 hover:text-ink sm:w-auto sm:flex-1">
+                  {/* padding lives inside so this tile sizes exactly like the others in the flex row */}
+                  <div className="flex h-full flex-col justify-between p-3.5">
+                  <span className="flex flex-col items-start gap-2">
+                    <Plus className="h-5.5 w-5.5" strokeWidth={1.6} />
+                    <span data-bar className="h-0.75 w-5 rounded-full bg-black/15 transition-[width] duration-500 ease-out group-hover:w-10" />
                   </span>
                   <div>
-                    <div className="text-[13px] font-medium sm:text-[14px]">New view</div>
-                    <div className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.08em]">Build your own</div>
+                    <div className="text-[13px] font-medium leading-tight">New view</div>
+                    <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em]">Build your own</div>
+                  </div>
                   </div>
                 </div>
               )}
-              {detail && (
-                <DockDetail key={detail.app.name} app={detail.app} origin={detail.from} category={cat.label} onClose={() => setDetail(null)} />
-              )}
             </div>
+            {/* phones: how far along the row you are */}
+            <div className="mx-auto mt-3 h-1 w-16 overflow-hidden rounded-full bg-black/8 sm:hidden" aria-hidden>
+              <div ref={rowThumb} className="h-full rounded-full bg-ink/55" style={{ width: "40%" }} />
+            </div>
+
+            {detail && (
+              <DockDetail key={detail.app.name} app={detail.app} origin={detail.from} category={cat.label} onClose={() => setDetail(null)} />
+            )}
           </div>
 
           {/* tabs sit on the card's top edge, so they always move with it */}
