@@ -57,8 +57,8 @@ function ScenePoster({ hidden }: { hidden: boolean }) {
     >
       <defs>
         <radialGradient id="poster-pad">
-          <stop offset="0" stopColor="#e6e5df" />
-          <stop offset="1" stopColor="#f7f7f4" stopOpacity="0" />
+          <stop offset="0" stopColor="var(--surface-2)" />
+          <stop offset="1" stopColor="var(--bg)" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="poster-face" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0" stopColor="#e4e7ee" />
@@ -296,7 +296,7 @@ export default function Hero() {
               <div
                 key={c.k}
                 data-callout
-                className={`absolute ${SLOTS[i]} invisible rounded-xl border border-white/70 bg-white/95 px-3.5 py-2.5 shadow-float`}
+                className={`absolute ${SLOTS[i]} invisible rounded-xl border border-surface/70 bg-surface/95 px-3.5 py-2.5 shadow-float`}
               >
                 <div className="flex items-center gap-1.5 text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted">
                   <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -323,7 +323,7 @@ export default function Hero() {
         >
           <div
             data-open={detail ? "true" : undefined}
-            className="relative rounded-[26px] border border-white/80 bg-white/95 px-4 pb-4 pt-9 shadow-float transition-[min-height] duration-500 ease-out data-open:min-h-84 sm:px-6 sm:pb-6 sm:pt-10 sm:data-open:min-h-62"
+            className="relative rounded-[26px] border border-surface/80 bg-surface/95 px-4 pb-4 pt-9 shadow-float transition-[min-height] duration-500 ease-out data-open:min-h-84 sm:px-6 sm:pb-6 sm:pt-10 sm:data-open:min-h-62"
           >
             <div className="flex items-center justify-between gap-3">
               <span data-workspace className="flex items-center gap-2 rounded-full border border-line bg-bg/70 py-1 pl-1.5 pr-2.5 text-[12.5px] font-medium text-ink-2">
@@ -336,12 +336,12 @@ export default function Hero() {
               <div className="flex items-center gap-2.5">
                 <div className="hidden -space-x-1.5 sm:flex" aria-hidden>
                   {["#2448ff", "#d0613a", "#3c7a5a", "#c4892b"].map((c, i) => (
-                    <span key={c} className="h-6 w-6 rounded-full border-2 border-white text-center text-[9px] leading-5 font-semibold text-white" style={{ background: c }}>
+                    <span key={c} className="h-6 w-6 rounded-full border-2 border-surface text-center text-[9px] leading-5 font-semibold text-white" style={{ background: c }}>
                       {["A", "R", "S", "M"][i]}
                     </span>
                   ))}
                 </div>
-                <span className="rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-white">Share</span>
+                <span className="rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-surface">Share</span>
               </div>
             </div>
 
@@ -362,12 +362,12 @@ export default function Hero() {
                 />
               ))}
               {cat.apps.length < 6 && (
-                <div data-app className="group h-28 w-36 min-w-0 shrink-0 snap-start cursor-pointer rounded-2xl border border-dashed border-black/15 text-muted transition-colors hover:border-black/30 hover:text-ink sm:w-auto sm:flex-1">
+                <div data-app className="group h-28 w-36 min-w-0 shrink-0 snap-start cursor-pointer rounded-2xl border border-dashed border-ink/15 text-muted transition-colors hover:border-ink/30 hover:text-ink sm:w-auto sm:flex-1">
                   {/* padding lives inside so this tile sizes exactly like the others in the flex row */}
                   <div className="flex h-full flex-col justify-between p-3.5">
                   <span className="flex flex-col items-start gap-2">
                     <Plus className="h-5.5 w-5.5" strokeWidth={1.6} />
-                    <span data-bar className="h-0.75 w-5 rounded-full bg-black/15 transition-[width] duration-500 ease-out group-hover:w-10" />
+                    <span data-bar className="h-0.75 w-5 rounded-full bg-ink/15 transition-[width] duration-500 ease-out group-hover:w-10" />
                   </span>
                   <div>
                     <div className="text-[13px] font-medium leading-tight">New view</div>
@@ -378,7 +378,7 @@ export default function Hero() {
               )}
             </div>
             {/* phones: how far along the row you are */}
-            <div className="mx-auto mt-3 h-1 w-16 overflow-hidden rounded-full bg-black/8 sm:hidden" aria-hidden>
+            <div className="mx-auto mt-3 h-1 w-16 overflow-hidden rounded-full bg-ink/8 sm:hidden" aria-hidden>
               <div ref={rowThumb} className="h-full rounded-full bg-ink/55" style={{ width: "40%" }} />
             </div>
 
@@ -395,7 +395,7 @@ export default function Hero() {
               onKeyDown={onTabKey}
               onFocus={(e) => setTabFocus(e.target.matches(":focus-visible"))}
               onBlur={() => setTabFocus(false)}
-              className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-full border border-line bg-[#eeeeea] p-1 shadow-[0_8px_20px_-10px_rgba(14,15,16,0.3)]"
+              className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-full border border-line bg-surface-2 p-1 shadow-[0_8px_20px_-10px_rgba(14,15,16,0.3)]"
             >
               {CATEGORIES.map((c, i) => {
                 const on = i === idx;
@@ -415,7 +415,7 @@ export default function Hero() {
                       setIdx(i);
                     }}
                     className={`relative flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 py-1.5 text-[13.5px] transition-all duration-300 ${
-                      on ? "bg-white font-medium text-ink shadow-sm" : "text-ink-2 hover:text-ink"
+                      on ? "bg-surface font-medium text-ink shadow-sm" : "text-ink-2 hover:text-ink"
                     }`}
                   >
                     {on && <TabProgress key={idx} playing={auto} onDone={next} />}

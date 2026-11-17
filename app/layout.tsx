@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { INDEXABLE, LIVE_SITE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
@@ -33,7 +34,18 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: SITE_DESCRIPTION },
 };
 
-export const viewport: Viewport = { themeColor: "#f7f7f4" };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f7f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0c0e" },
+  ],
+};
+
+/**
+ * Runs before first paint: picks the saved theme, else the device setting, so the page never
+ * flashes the wrong theme. Kept tiny and dependency-free; ThemeToggle reads/writes the same key.
+ */
+const THEME_SCRIPT = `try{var t=localStorage.getItem("rej-theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme="light"}`;
 
 const JSON_LD = {
   "@context": "https://schema.org",
@@ -51,12 +63,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${serif.variable} antialiased`}
     >
       <body className="min-h-full">
+        <Script id="theme" strategy="beforeInteractive">
+          {THEME_SCRIPT}
+        </Script>
         <a
           href="#main"
-          className="fixed left-3 top-3 z-100 -translate-y-16 rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-white transition-transform focus:translate-y-0"
+          className="fixed left-3 top-3 z-100 -translate-y-16 rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-surface transition-transform focus:translate-y-0"
         >
           Skip to content
         </a>

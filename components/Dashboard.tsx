@@ -69,20 +69,20 @@ function LineChart({ horizon }: { horizon: number }) {
     <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="h-full w-full">
       {[100, 120, 140, 160].map((v) => (
         <g key={v}>
-          <line x1={PAD} x2={W - PAD} y1={Y(v)} y2={Y(v)} stroke="#0e0f10" strokeOpacity="0.06" />
-          <text x={W - PAD + 4} y={Y(v) + 3} fontSize="9" fill="#74746f">{v}</text>
+          <line x1={PAD} x2={W - PAD} y1={Y(v)} y2={Y(v)} stroke="var(--ink)" strokeOpacity="0.06" />
+          <text x={W - PAD + 4} y={Y(v) + 3} fontSize="9" fill="var(--muted)">{v}</text>
         </g>
       ))}
-      <line x1={X(off)} x2={X(off)} y1={PAD - 6} y2={H - PAD} stroke="#0e0f10" strokeOpacity="0.2" strokeDasharray="2 3" />
-      <text x={X(off) + 5} y={PAD} fontSize="9" fill="#74746f">Forecast →</text>
+      <line x1={X(off)} x2={X(off)} y1={PAD - 6} y2={H - PAD} stroke="var(--ink)" strokeOpacity="0.2" strokeDasharray="2 3" />
+      <text x={X(off) + 5} y={PAD} fontSize="9" fill="var(--muted)">Forecast →</text>
       <path data-band d={band} fill="#2448ff" fillOpacity="0.12" />
-      <path data-hist d={hist} fill="none" stroke="#0e0f10" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
+      <path data-hist d={hist} fill="none" stroke="var(--ink)" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
       <path data-fc d={fcPath} fill="none" stroke="#2448ff" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
       {fc.slice(1).map((v, i) => (
         <circle key={i} cx={X(off + i + 1)} cy={Y(v)} r="3" fill="#fff" stroke="#2448ff" strokeWidth="1.8" />
       ))}
       {YEARS.map((y, i) => (
-        <text key={y} x={X(i)} y={H - 6} fontSize="9" textAnchor="middle" fill={i > off && i - off > horizon ? "#c9c9c4" : "#74746f"}>
+        <text key={y} x={X(i)} y={H - 6} fontSize="9" textAnchor="middle" fill={i > off && i - off > horizon ? "var(--line)" : "var(--muted)"}>
           {String(y).slice(2)}
         </text>
       ))}
@@ -143,7 +143,7 @@ function MobileTour({ active, onSelect }: { active: number; onSelect: (i: number
               aria-selected={on}
               onClick={() => onSelect(i)}
               className={`relative flex cursor-pointer items-center justify-center gap-1.5 overflow-hidden rounded-xl px-2 py-2.5 text-[13px] font-medium transition-colors duration-300 ${
-                on ? "bg-white text-ink" : "text-white/60"
+                on ? "bg-white text-[#0e0f10]" : "text-white/60"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -219,7 +219,7 @@ export default function Dashboard() {
     `transition-all duration-500 ${active === i ? "ring-2 ring-accent/70 ring-offset-2 ring-offset-white" : "opacity-60"}`;
 
   return (
-    <section ref={root} id="platform" className="relative bg-[#0e0f10] py-28 text-white sm:py-40">
+    <section ref={root} id="platform" className="relative bg-deep py-28 text-white sm:py-40">
       <div className="mx-auto max-w-310 px-5 sm:px-8">
         <div className="max-w-190">
           <SectionHeading eyebrow="Custom dashboard features" title="Answers in a few clicks," accent="not a few weeks" dark bodyWidth="max-w-140">
@@ -232,12 +232,12 @@ export default function Dashboard() {
           <div className="min-w-0">
           <MobileTour active={active} onSelect={setActive} />
           <div className="lg:sticky lg:top-27.5 lg:h-fit lg:[@media(max-height:920px)]:top-23" style={{ perspective: 1200 }}>
-            <div data-mock className="overflow-hidden rounded-[22px] bg-white text-ink shadow-[0_40px_120px_-30px_rgba(36,72,255,0.45)]">
+            <div data-mock className="overflow-hidden rounded-[22px] bg-surface text-ink shadow-[0_40px_120px_-30px_rgba(36,72,255,0.45)] dark:ring-1 dark:ring-white/10">
               <div className="flex items-center gap-2 border-b border-line px-4 py-3">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-                <div className="ml-3 flex min-w-0 flex-1 items-center gap-2 rounded-md bg-black/4 px-2.5 py-1 text-[11px] text-muted">
+                <div className="ml-3 flex min-w-0 flex-1 items-center gap-2 rounded-md bg-ink/4 px-2.5 py-1 text-[11px] text-muted">
                   <Search className="h-3 w-3 shrink-0" /> <span className="truncate">app.rejournal.in / office / mumbai</span>
                 </div>
                 <span className="shrink-0 rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">Illustrative data</span>
@@ -253,7 +253,7 @@ export default function Dashboard() {
                 <div className="min-w-0 flex-1 p-4 sm:p-5">
                   <div className={`no-scrollbar flex gap-1.5 overflow-x-auto rounded-xl p-1 sm:flex-wrap ${ring(1)}`}>
                     {["City: Mumbai", "Asset: Office", "Grade A", "Submarket: BKC", "2019 – 2030"].map((f) => (
-                      <span key={f} className="flex shrink-0 items-center gap-1 rounded-lg border border-line bg-white px-2.5 py-1 text-[11.5px] font-medium">
+                      <span key={f} className="flex shrink-0 items-center gap-1 rounded-lg border border-line bg-surface px-2.5 py-1 text-[11.5px] font-medium">
                         {f} <ChevronDown className="h-3 w-3 text-muted" />
                       </span>
                     ))}
@@ -276,12 +276,12 @@ export default function Dashboard() {
                   <div className={`mt-4 rounded-xl border border-line p-3 ${ring(2)}`}>
                     <div className="flex items-center justify-between">
                       <div className="text-[12px] font-medium">Rent outlook · Grade A office</div>
-                      <div className="flex gap-0.5 rounded-lg bg-black/4 p-0.5">
+                      <div className="flex gap-0.5 rounded-lg bg-ink/4 p-0.5">
                         {[1, 2, 3, 4, 5].map((y) => (
                           <button
                             key={y}
                             onClick={() => setHorizon(y)}
-                            className={`cursor-pointer rounded-md px-2 py-0.5 text-[10.5px] font-medium transition ${horizon === y ? "bg-white shadow-sm" : "text-muted"}`}
+                            className={`cursor-pointer rounded-md px-2 py-0.5 text-[10.5px] font-medium transition ${horizon === y ? "bg-surface shadow-sm" : "text-muted"}`}
                           >
                             Y{y}
                           </button>
@@ -298,7 +298,7 @@ export default function Dashboard() {
                       <div className="text-[12px] font-medium">Quarterly leasing</div>
                       <div className="mt-3 flex h-21 items-end gap-1.5">
                         {BARS.map((b, i) => (
-                          <div key={i} data-bar className="flex-1 rounded-t-sm" style={{ height: `${(b / 6) * 100}%`, background: i === BARS.length - 1 ? "#2448ff" : "#0e0f10", opacity: i === BARS.length - 1 ? 1 : 0.15 + i * 0.08 }} />
+                          <div key={i} data-bar className="flex-1 rounded-t-sm" style={{ height: `${(b / 6) * 100}%`, background: i === BARS.length - 1 ? "#2448ff" : "var(--ink)", opacity: i === BARS.length - 1 ? 1 : 0.15 + i * 0.08 }} />
                         ))}
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export default function Dashboard() {
           {BADGES.map((b) => {
             const Icon = b.icon;
             return (
-              <div key={b.k} data-badge className="flex items-center gap-3 bg-[#0e0f10] p-5">
+              <div key={b.k} data-badge className="flex items-center gap-3 bg-deep p-5">
                 <Icon className="h-5 w-5 shrink-0 text-accent" />
                 <div>
                   <div className="text-[14px] font-medium">{b.k}</div>

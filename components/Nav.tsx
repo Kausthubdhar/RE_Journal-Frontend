@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Logo, { SocialIcon } from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 import { gsap, prefersReducedMotion, scrollToId, useGSAP } from "@/lib/gsap";
 import { LINKS } from "@/lib/site";
 
@@ -79,7 +80,7 @@ export default function Nav() {
     <header ref={bar} className="fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3">
       <nav
         className={`flex w-full items-center justify-between rounded-2xl px-4 py-2.5 transition-all duration-500 ease-out sm:px-5 ${
-          scrolled ? "glass shadow-float max-w-270 border border-white/60" : "max-w-330 border border-transparent"
+          scrolled ? "glass shadow-float max-w-270 border border-surface/60" : "max-w-330 border border-transparent"
         }`}
       >
         <button onClick={() => go("top")} aria-label="RE Journal home" className="cursor-pointer">
@@ -90,7 +91,7 @@ export default function Nav() {
           {pill && (
             <li
               aria-hidden
-              className="pointer-events-none absolute inset-y-0 rounded-full bg-black/6 transition-[left,width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="pointer-events-none absolute inset-y-0 rounded-full bg-ink/6 transition-[left,width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{ left: pill.left, width: pill.width }}
             />
           )}
@@ -113,32 +114,33 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-1.5">
+          <ThemeToggle />
           <a
             href="https://www.linkedin.com/company/rejournal-in"
             target="_blank"
             rel="noreferrer"
             aria-label="LinkedIn"
-            className="hidden h-9 w-9 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-black/5 sm:flex"
+            className="hidden h-9 w-9 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-ink/5 sm:flex"
           >
             <SocialIcon name="linkedin" />
           </a>
-          <Link href={LINKS.signIn} className="hidden rounded-full px-3.5 py-2 text-[14px] font-medium text-ink sm:block hover:bg-black/4.5">
+          <Link href={LINKS.signIn} className="hidden rounded-full px-3.5 py-2 text-[14px] font-medium text-ink sm:block hover:bg-ink/4.5">
             Log in
           </Link>
           <button
             onClick={() => go("contact")}
-            className="hidden cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-[14px] font-medium shadow-sm transition hover:border-black/20 md:block"
+            className="hidden cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-[14px] font-medium shadow-sm transition hover:border-ink/20 md:block"
           >
             Book your demo
           </button>
           <Link
             href={LINKS.signUp}
-            className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-white transition hover:bg-black/80"
+            className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-surface transition hover:bg-ink/80"
           >
             Get started
           </Link>
           <button
-            className="ml-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full hover:bg-black/5 lg:hidden"
+            className="ml-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full hover:bg-ink/5 lg:hidden"
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={open}
@@ -148,22 +150,22 @@ export default function Nav() {
         </div>
       </nav>
 
-      <div ref={sheet} className="invisible absolute inset-x-3 top-18 rounded-2xl glass shadow-float border border-white/60 p-3 opacity-0 lg:hidden">
+      <div ref={sheet} className="invisible absolute inset-x-3 top-18 rounded-2xl glass shadow-float border border-surface/60 p-3 opacity-0 lg:hidden">
         {NAV_LINKS.map((l) => (
           <button
             key={l.id}
             data-item
             onClick={() => go(l.id)}
-            className="block w-full cursor-pointer rounded-xl px-4 py-3 text-left text-[17px] font-medium hover:bg-black/5"
+            className="block w-full cursor-pointer rounded-xl px-4 py-3 text-left text-[17px] font-medium hover:bg-ink/5"
           >
             {l.label}
           </button>
         ))}
         <div data-item className="mt-2 grid grid-cols-2 gap-2">
-          <Link href={LINKS.signIn} className="rounded-xl border border-line bg-white px-4 py-3 text-center text-[15px] font-medium">
+          <Link href={LINKS.signIn} className="rounded-xl border border-line bg-surface px-4 py-3 text-center text-[15px] font-medium">
             Log in
           </Link>
-          <button onClick={() => go("contact")} className="cursor-pointer rounded-xl border border-line bg-white px-4 py-3 text-[15px] font-medium">
+          <button onClick={() => go("contact")} className="cursor-pointer rounded-xl border border-line bg-surface px-4 py-3 text-[15px] font-medium">
             Book your demo
           </button>
         </div>

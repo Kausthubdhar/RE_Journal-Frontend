@@ -118,9 +118,9 @@ export default function Coverage() {
                 className={`group flex cursor-default items-center justify-between border-b border-line py-3.5 transition-colors ${hot === m.name ? "text-ink" : "text-ink-2"}`}
               >
                 <span className="flex items-center gap-3">
-                  <span className={`h-2 w-2 rounded-full transition-all ${hot === m.name ? "scale-150 bg-accent" : "bg-black/25"}`} />
+                  <span className={`h-2 w-2 rounded-full transition-all ${hot === m.name ? "scale-150 bg-accent" : "bg-ink/25"}`} />
                   <span className="text-[18px] font-medium tracking-tight">{m.name}</span>
-                  {m.hq && <span className="rounded-full bg-ink px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">HQ</span>}
+                  {m.hq && <span className="rounded-full bg-ink px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-surface">HQ</span>}
                 </span>
                 <span className="font-mono text-[12px] text-muted">
                   {m.lat.toFixed(2)}° N · {m.lon.toFixed(2)}° E
@@ -132,7 +132,7 @@ export default function Coverage() {
         </div>
 
         <div data-map className="relative">
-          <div className="absolute -inset-6 rounded-[40px] bg-linear-to-b from-white to-transparent" />
+          <div className="absolute -inset-6 rounded-[40px] bg-linear-to-b from-surface to-transparent" />
           <svg viewBox="0 0 310 340" className="relative w-full" role="img" aria-label="Map of India showing RE Journal's key markets, connected to the Mumbai headquarters">
             <defs>
               <radialGradient id="glow">
@@ -144,8 +144,8 @@ export default function Coverage() {
               <circle data-reveal cx="130" cy="190" r="260" fill="#fff" />
             </mask>
             <g mask="url(#map-reveal)">
-              <path d={DOT_LAYERS.far} fill="#0e0f10" opacity="0.12" />
-              <path d={DOT_LAYERS.mid} fill="#0e0f10" opacity="0.22" />
+              <path d={DOT_LAYERS.far} fill="var(--ink)" opacity="0.12" />
+              <path d={DOT_LAYERS.mid} fill="var(--ink)" opacity="0.22" />
               <path d={DOT_LAYERS.near} fill="#2448ff" opacity="0.55" />
             </g>
             {MARKETS.slice(1).map((m) => {
@@ -157,7 +157,7 @@ export default function Coverage() {
                   data-arc
                   d={`M${x1},${y1} Q${mx},${my} ${x2},${y2}`}
                   fill="none"
-                  stroke={hot === m.name ? "#2448ff" : "#0e0f10"}
+                  stroke={hot === m.name ? "var(--accent)" : "var(--ink)"}
                   strokeOpacity={hot === m.name ? 0.9 : 0.25}
                   strokeWidth={hot === m.name ? 1.3 : 0.8}
                   className="transition-all duration-300"
@@ -171,16 +171,16 @@ export default function Coverage() {
                 <g key={m.name} data-node onPointerEnter={() => setHot(m.name)} onPointerLeave={() => setHot(null)} className="cursor-pointer">
                   <circle cx={x} cy={y} r="14" fill="url(#glow)" />
                   <circle cx={x} cy={y} r="3.2" fill="#2448ff" className="ping-soft" />
-                  <circle cx={x} cy={y} r={on ? 4.6 : 3.4} fill="#fff" stroke="#2448ff" strokeWidth="2" className="transition-all" />
+                  <circle cx={x} cy={y} r={on ? 4.6 : 3.4} fill="var(--surface)" stroke="var(--accent)" strokeWidth="2" className="transition-all" />
                   <g className={`transition-opacity duration-300 ${on ? "opacity-100" : "opacity-0"}`}>
-                    <rect x={x + 8} y={y - 11} width={m.name.length * 5.6 + 14} height="20" rx="6" fill="#0e0f10" />
-                    <text x={x + 15} y={y + 3} fontSize="9.5" fill="#fff" fontWeight="500">{m.name}</text>
+                    <rect x={x + 8} y={y - 11} width={m.name.length * 5.6 + 14} height="20" rx="6" fill="var(--ink)" />
+                    <text x={x + 15} y={y + 3} fontSize="9.5" fill="var(--surface)" fontWeight="500">{m.name}</text>
                   </g>
                 </g>
               );
             })}
           </svg>
-          <div className="absolute bottom-2 right-0 flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-[12px] font-medium shadow-sm">
+          <div className="absolute bottom-2 right-0 flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-medium shadow-sm">
             <span className="h-2 w-2 rounded-full bg-accent" /> Pan-India coverage
             <ArrowUpRight className="h-3.5 w-3.5 text-muted" />
           </div>

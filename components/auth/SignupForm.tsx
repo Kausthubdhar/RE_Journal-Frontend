@@ -83,7 +83,7 @@ export default function SignupForm() {
                 <label
                   key={r}
                   className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-[13.5px] font-medium transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${
-                    on ? "border-ink bg-ink text-white" : "border-line bg-white text-ink-2 hover:border-black/25"
+                    on ? "border-ink bg-ink text-surface" : "border-line bg-surface text-ink-2 hover:border-ink/25"
                   }`}
                 >
                   <input type="radio" name="role" value={r} checked={on} onChange={() => setRole(r)} className="sr-only" />
@@ -113,7 +113,7 @@ export default function SignupForm() {
               <span className="flex items-center gap-3" aria-live="polite">
                 <span className="flex flex-1 gap-1" aria-hidden>
                   {[1, 2, 3, 4].map((i) => (
-                    <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${pw && score >= i ? LEVEL_COLOR[score] : "bg-black/8"}`} />
+                    <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${pw && score >= i ? LEVEL_COLOR[score] : "bg-ink/8"}`} />
                   ))}
                 </span>
                 <span className="w-16 text-right">{pw ? LEVELS[score] : "Strength"}</span>

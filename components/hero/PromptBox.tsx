@@ -48,7 +48,7 @@ export default function PromptBox() {
         e.preventDefault();
         setSent(true);
       }}
-      className="relative z-30 mx-auto mt-8 w-[min(580px,calc(100%-32px))] rounded-2xl border border-line bg-white p-3 shadow-float transition-[border-color,box-shadow] duration-300 has-[textarea:focus]:border-accent/40 has-[textarea:focus]:shadow-[0_0_0_4px_var(--accent-soft),0_8px_24px_-6px_rgba(14,15,16,0.1),0_24px_60px_-20px_rgba(14,15,16,0.18)]"
+      className="relative z-30 mx-auto mt-8 w-[min(580px,calc(100%-32px))] rounded-2xl border border-line bg-surface p-3 shadow-float transition-[border-color,box-shadow] duration-300 has-[textarea:focus]:border-accent/40 has-[textarea:focus]:shadow-[0_0_0_4px_var(--accent-soft),0_8px_24px_-6px_rgba(14,15,16,0.1),0_24px_60px_-20px_rgba(14,15,16,0.18)]"
     >
       <label htmlFor="ask" className="sr-only">
         Ask the market
@@ -80,16 +80,16 @@ export default function PromptBox() {
         )}
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-black/5">
+        <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-ink/5">
           <Paperclip className="h-3.5 w-3.5" /> Upload portfolio
         </button>
-        <button type="button" className="hidden cursor-pointer items-center gap-1 rounded-full border border-line px-2.5 py-1 text-[13px] text-ink-2 hover:bg-black/5 sm:flex">
+        <button type="button" className="hidden cursor-pointer items-center gap-1 rounded-full border border-line px-2.5 py-1 text-[13px] text-ink-2 hover:bg-ink/5 sm:flex">
           All cities <ChevronDown className="h-3.5 w-3.5" />
         </button>
         <button
           type="submit"
           aria-label="Ask"
-          className="ml-auto flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-ink text-white transition hover:scale-105 active:scale-95"
+          className="ml-auto flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-ink text-surface transition hover:scale-105 active:scale-95"
         >
           <ArrowUp className="h-4 w-4" />
         </button>

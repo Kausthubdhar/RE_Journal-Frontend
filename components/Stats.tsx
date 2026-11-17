@@ -65,7 +65,7 @@ export default function Stats() {
           {[...CITIES, ...CITIES].map((c, i) => (
             <span key={i} className="flex items-center gap-10 text-[15px] text-muted">
               <span className="font-medium text-ink-2">{c}</span>
-              <span className="h-1 w-1 rounded-full bg-black/25" />
+              <span className="h-1 w-1 rounded-full bg-ink/25" />
             </span>
           ))}
         </div>
@@ -92,7 +92,7 @@ export default function Stats() {
                 </div>
                 <div className="mt-3 text-[15px] font-medium">{s.label}</div>
                 <div className="text-[13px] text-muted">{s.note}</div>
-                <div className="mt-5 h-0.75 w-full overflow-hidden rounded-full bg-black/6">
+                <div className="mt-5 h-0.75 w-full overflow-hidden rounded-full bg-ink/6">
                   <div data-bar className="h-full rounded-full bg-ink" style={{ width: `${40 + i * 18}%` }} />
                 </div>
               </div>

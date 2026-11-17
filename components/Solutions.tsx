@@ -78,7 +78,7 @@ export default function Solutions() {
             A comprehensive range of products tailored to your investment needs and market requirements.
           </SectionHeading>
             </div>
-            <a href={LINKS.products} className="group mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-ink px-5 py-3 text-[14px] font-medium text-white">
+            <a href={LINKS.products} className="group mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-ink px-5 py-3 text-[14px] font-medium text-surface">
               View all products
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
@@ -91,13 +91,13 @@ export default function Solutions() {
                 key={p.name}
                 data-card
                 className="group relative flex h-110 flex-col overflow-hidden rounded-[28px] p-7 sm:h-120 lg:h-[min(560px,70vh)] lg:w-100 lg:shrink-0"
-                style={{ background: p.bg }}
+                style={{ background: `color-mix(in oklab, ${p.bg} var(--pastel), var(--surface))` }}
               >
                 <div className="flex items-start justify-between">
                   <span className="font-mono text-[12px]" style={{ color: p.ink }}>
                     0{i + 1} / 05
                   </span>
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/70 transition-transform duration-500 group-hover:rotate-[-8deg] group-hover:scale-110" style={{ color: p.ink }}>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface/70 transition-transform duration-500 group-hover:rotate-[-8deg] group-hover:scale-110" style={{ color: p.ink }}>
                     <Icon className="h-5 w-5" />
                   </span>
                 </div>
@@ -116,7 +116,7 @@ export default function Solutions() {
           <div className="hidden w-[8vw] shrink-0 lg:block" />
         </div>
 
-        <div className="mx-auto mt-10 hidden h-0.5 w-[min(1240px,calc(100%-64px))] overflow-hidden rounded-full bg-black/[0.07] lg:block">
+        <div className="mx-auto mt-10 hidden h-0.5 w-[min(1240px,calc(100%-64px))] overflow-hidden rounded-full bg-ink/[0.07] lg:block">
           <div data-progress className="h-full origin-left scale-x-0 bg-ink" />
         </div>
       </div>

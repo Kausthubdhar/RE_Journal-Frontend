@@ -138,7 +138,7 @@ export default function DockDetail({
       ref={root}
       role="dialog"
       aria-label={`${app.name} preview`}
-      className="absolute inset-0 z-10 flex flex-col rounded-[26px] border border-line bg-white px-4 pb-4 pt-9 sm:px-6 sm:pb-5 sm:pt-10"
+      className="absolute inset-0 z-10 flex flex-col rounded-[26px] border border-line bg-surface px-4 pb-4 pt-9 sm:px-6 sm:pb-5 sm:pt-10"
       style={{ ["--tile" as string]: app.color }}
     >
       <div data-in className="flex items-center gap-3">
@@ -161,7 +161,7 @@ export default function DockDetail({
             close();
             scrollToId("platform");
           }}
-          className="hidden cursor-pointer items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-[12.5px] font-medium text-white transition-colors hover:bg-black/80 sm:flex"
+          className="hidden cursor-pointer items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-[12.5px] font-medium text-surface transition-colors hover:bg-ink/80 sm:flex"
         >
           Open in dashboard <ArrowRight className="h-3.5 w-3.5" />
         </button>
@@ -170,7 +170,7 @@ export default function DockDetail({
           type="button"
           onClick={close}
           aria-label="Close preview"
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-line text-muted transition-colors hover:bg-black/5 hover:text-ink"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-line text-muted transition-colors hover:bg-ink/5 hover:text-ink"
         >
           <X className="h-4 w-4" />
         </button>

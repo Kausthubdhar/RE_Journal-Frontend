@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "../Logo";
+import ThemeToggle from "../ThemeToggle";
 import BrandPanel from "./BrandPanel";
 
 type Props = {
@@ -21,12 +22,15 @@ export default function AuthShell({ variant, children }: Props) {
           <Link href="/" aria-label="RE Journal home" className="rounded-lg">
             <Logo />
           </Link>
+          <div className="flex items-center gap-2">
           <p className="hidden text-[14px] text-muted sm:block">
             {swap.text}{" "}
             <Link href={swap.href} className="font-medium text-ink underline-offset-4 hover:underline">
               {swap.label}
             </Link>
           </p>
+          <ThemeToggle />
+          </div>
         </header>
 
         <div className="mx-auto flex w-full max-w-105 flex-1 flex-col justify-center py-12">{children}</div>

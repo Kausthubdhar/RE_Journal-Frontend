@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the data-theme attribute set on <html> (system default, overridable) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   --bg: #f7f7f4;
   --surface: #ffffff;
+  --surface-2: #eeeeea;
   --ink: #0e0f10;
   --ink-2: #3a3b3d;
   --muted: #66665f;
@@ -11,11 +15,43 @@
   --accent-soft: #e6eaff;
   --warm: #ff7a3d;
   --gold: #d9a441;
+  /* always-dark sections (dashboard, CTA, auth brand panel) */
+  --deep: #0e0f10;
+  --glass: rgba(255, 255, 255, 0.86);
+  --float-hi: rgba(255, 255, 255, 0.8);
+  /* product-card pastels: 100% = the pastel itself, lower = tinted over the surface */
+  --pastel: 100%;
+  --iso-plinth: #e4e1d8;
+  --iso-plinth-top: #f4f2ec;
+  --iso-plinth-side: #d3cfc4;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0b0c0e;
+  --surface: #15171a;
+  --surface-2: #1e2024;
+  --ink: #ecebe6;
+  --ink-2: #c3c2bc;
+  --muted: #8f8e88;
+  --line: rgba(236, 235, 230, 0.1);
+  --accent: #5a7bff;
+  --accent-soft: #1b2350;
+  --deep: #121417;
+  --glass: rgba(21, 23, 26, 0.82);
+  --float-hi: rgba(255, 255, 255, 0.04);
+  --pastel: 13%;
+  --iso-plinth: #26282c;
+  --iso-plinth-top: #2f3136;
+  --iso-plinth-side: #1d1f22;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-deep: var(--deep);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-muted: var(--muted);
@@ -84,14 +120,14 @@ html.lenis body {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--glass);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
 .shadow-float {
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 1px 0 var(--float-hi) inset,
     0 1px 2px rgba(14, 15, 16, 0.04),
     0 8px 24px -6px rgba(14, 15, 16, 0.1),
     0 24px 60px -20px rgba(14, 15, 16, 0.18);
@@ -154,7 +190,7 @@ html.lenis body {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
-  .bg-ink :focus-visible {
+  .bg-deep :focus-visible {
     outline-color: #fff;
   }
 }
@@ -192,4 +228,11 @@ html.lenis body {
   .hero-word > span {
     animation: none !important;
   }
+}
+
+/* theme switch: the toggle animates the new theme in as a growing circle (View Transitions API) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

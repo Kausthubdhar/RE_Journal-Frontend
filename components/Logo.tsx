@@ -1,10 +1,10 @@
 function LogoMark() {
   return (
     <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
-      <rect width="32" height="32" rx="9" fill="#0e0f10" />
-      <rect x="8" y="17" width="4" height="7" rx="1.2" fill="#fff" />
-      <rect x="14" y="12" width="4" height="12" rx="1.2" fill="#fff" />
-      <rect x="20" y="8" width="4" height="16" rx="1.2" fill="#fff" />
+      <rect width="32" height="32" rx="9" fill="var(--ink)" />
+      <rect x="8" y="17" width="4" height="7" rx="1.2" fill="var(--surface)" />
+      <rect x="14" y="12" width="4" height="12" rx="1.2" fill="var(--surface)" />
+      <rect x="20" y="8" width="4" height="16" rx="1.2" fill="var(--surface)" />
       <circle cx="24.5" cy="6.5" r="2" fill="#2448ff" />
     </svg>
   );

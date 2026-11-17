@@ -693,7 +693,8 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       else Object.assign(view, next);
     };
 
-    scene.add(new THREE.HemisphereLight("#ffffff", "#d9d4ca", 0.9));
+    const hemi = new THREE.HemisphereLight("#ffffff", "#d9d4ca", 0.9);
+    scene.add(hemi);
     const sun = new THREE.DirectionalLight("#fff3e2", 2.4);
     sun.position.set(18, 30, 14);
     sun.castShadow = true;
@@ -731,6 +732,39 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
 
     const facades = makeFacades();
     const mats = makeMats();
+
+    // ---- day / night: dark mode turns the city into a night scene with glowing windows ----
+    const night = { v: 0 };
+    const DAY = { sky: new THREE.Color("#ffffff"), ground: new THREE.Color("#d9d4ca"), sun: new THREE.Color("#fff3e2"), fog: new THREE.Color("#f7f7f4"), grid: new THREE.Color("#0e0f10"), pad: new THREE.Color("#ffffff") };
+    const NIGHT = { sky: new THREE.Color("#8ea4d8"), ground: new THREE.Color("#15171c"), sun: new THREE.Color("#a9bcff"), fog: new THREE.Color("#0b0c0e"), grid: new THREE.Color("#ecebe6"), pad: new THREE.Color("#30333a"), wall: new THREE.Color("#4a5368") };
+    const lerp = (a: number, b: number) => a + (b - a) * night.v;
+    /** window glow: every lit facade material scales from its daytime intensity */
+    const tuneEmissive = () => {
+      scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
+        if (!m || !("emissiveMap" in m) || !m.emissiveMap) return;
+        m.userData.baseEm ??= m.emissiveIntensity;
+        m.userData.baseColor ??= m.color.clone();
+        m.emissiveIntensity = m.userData.baseEm * lerp(1, 2.6);
+        // walls dim towards a cool dusk tone at night so the lit windows stand out
+        m.color.copy(m.userData.baseColor).lerp(NIGHT.wall, night.v * 0.55);
+      });
+    };
+    const applyNight = () => {
+      hemi.color.lerpColors(DAY.sky, NIGHT.sky, night.v);
+      hemi.groundColor.lerpColors(DAY.ground, NIGHT.ground, night.v);
+      hemi.intensity = lerp(0.9, 0.32);
+      sun.color.lerpColors(DAY.sun, NIGHT.sun, night.v);
+      sun.intensity = lerp(2.4, 0.75);
+      scene.environmentIntensity = lerp(0.55, 0.16);
+      renderer.toneMappingExposure = lerp(1.05, 0.95);
+      (scene.fog as THREE.Fog).color.lerpColors(DAY.fog, NIGHT.fog, night.v);
+      (gridMat as THREE.LineBasicMaterial).color.lerpColors(DAY.grid, NIGHT.grid, night.v);
+      gridMat.opacity = lerp(0.045, 0.06);
+      (pad.material as THREE.MeshBasicMaterial).color.lerpColors(DAY.pad, NIGHT.pad, night.v);
+      (catcher.material as THREE.ShadowMaterial).opacity = lerp(0.16, 0.32);
+      tuneEmissive();
+    };
     const cache = new MatCache(facades);
 
     type Live = { group: THREE.Group; spinners: Spinner[] };
@@ -777,6 +811,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       sceneBox.setFromObject(b.group);
       reframe(!!old);
       scene.add(b.group);
+      tuneEmissive();
       live.add(entry);
       current = entry;
 
@@ -818,6 +853,22 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       reframe(false);
       dirty = true;
     };
+    const isDark = () => document.documentElement.dataset.theme === "dark";
+    night.v = isDark() ? 1 : 0;
+    applyNight();
+    const themeObserver = new MutationObserver(() => {
+      gsap.to(night, {
+        v: isDark() ? 1 : 0,
+        duration: prefersReducedMotion() ? 0 : 0.8,
+        ease: "power2.inOut",
+        overwrite: true,
+        onUpdate: () => {
+          applyNight();
+          dirty = true;
+        },
+      });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
     resize();
@@ -893,6 +944,8 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     return () => {
       cancelAnimationFrame(raf);
       viewTween?.kill();
+      themeObserver.disconnect();
+      gsap.killTweensOf(night);
       ro.disconnect();
       io.disconnect();
       window.removeEventListener("pointermove", onMove);

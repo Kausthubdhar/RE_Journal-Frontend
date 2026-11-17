@@ -45,8 +45,8 @@ export default function Method() {
 
   return (
     <section ref={root} className="relative overflow-hidden py-28 sm:py-40">
-      <div data-orbit className="pointer-events-none absolute right-[-20vw] top-10 h-[60vw] w-[60vw] rounded-full border border-dashed border-black/10" />
-      <div className="pointer-events-none absolute right-[-12vw] top-[18%] h-[44vw] w-[44vw] rounded-full border border-black/6" />
+      <div data-orbit className="pointer-events-none absolute right-[-20vw] top-10 h-[60vw] w-[60vw] rounded-full border border-dashed border-ink/10" />
+      <div className="pointer-events-none absolute right-[-12vw] top-[18%] h-[44vw] w-[44vw] rounded-full border border-ink/6" />
 
       <div className="relative mx-auto grid max-w-310 gap-14 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="lg:sticky lg:top-32 lg:h-fit">
@@ -64,14 +64,14 @@ export default function Method() {
         </div>
 
         <div data-steps className="relative">
-          <div className="absolute bottom-8 left-6.75 top-8 w-px bg-black/10" />
+          <div className="absolute bottom-8 left-6.75 top-8 w-px bg-ink/10" />
           <div data-line className="absolute bottom-8 left-6.75 top-8 w-px origin-top bg-ink" />
           {STEPS.map((s, i) => (
             <div key={s.k} data-step className="relative grid grid-cols-[56px_1fr] gap-6 pb-16 last:pb-0">
-              <span data-num className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-line bg-white font-mono text-[15px] shadow-float">
+              <span data-num className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-line bg-surface font-mono text-[15px] shadow-float">
                 0{i + 1}
               </span>
-              <div data-body className="rounded-3xl border border-line bg-white p-7">
+              <div data-body className="rounded-3xl border border-line bg-surface p-7">
                 <h3 className="text-[24px] font-semibold tracking-[-0.02em]">{s.k}</h3>
                 <p className="mt-3 text-[15.5px] leading-relaxed text-muted">{s.body}</p>
                 <div className="mt-5 flex flex-wrap gap-2">

@@ -47,7 +47,7 @@ export default function BrandPanel({ variant }: { variant: "login" | "signup" })
   return (
     <div
       ref={root}
-      className="relative flex h-full min-h-[calc(100dvh-1.5rem)] flex-col overflow-hidden rounded-[28px] bg-[#0e0f10] p-10 text-white xl:p-14"
+      className="relative flex h-full min-h-[calc(100dvh-1.5rem)] flex-col overflow-hidden rounded-[28px] bg-deep p-10 text-white xl:p-14"
     >
       <div className="bg-dots pointer-events-none absolute inset-0 opacity-60" />
       <div className="pointer-events-none absolute -right-24 top-1/3 h-120 w-120 rounded-full bg-accent/35 blur-[120px]" />

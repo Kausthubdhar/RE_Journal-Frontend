@@ -67,7 +67,7 @@ function FounderSpotlight() {
   );
 
   return (
-    <div ref={root} className="mt-24 overflow-hidden rounded-4xl border border-line bg-white">
+    <div ref={root} className="mt-24 overflow-hidden rounded-4xl border border-line bg-surface">
       <div className="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         {/* profile */}
         <div data-profile className="relative flex flex-col items-center border-b border-line bg-[radial-gradient(120%_70%_at_50%_0%,var(--accent-soft),transparent_70%)] px-8 pb-10 pt-14 text-center sm:px-12 lg:border-b-0 lg:border-r lg:pt-16">
@@ -79,7 +79,7 @@ function FounderSpotlight() {
             <svg data-arc-wrap viewBox="0 0 100 100" className="absolute -left-3 -top-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] overflow-visible" aria-hidden>
               <circle data-arc cx="50" cy="50" r="49" fill="none" stroke="var(--accent)" strokeWidth="1.2" strokeLinecap="round" pathLength={100} strokeDasharray="100" strokeDashoffset="62" />
             </svg>
-            <div className="relative h-full w-full overflow-hidden rounded-full bg-[#5d5d63] shadow-[0_24px_60px_-20px_rgba(14,15,16,0.45)] ring-4 ring-white">
+            <div className="relative h-full w-full overflow-hidden rounded-full bg-[#5d5d63] shadow-[0_24px_60px_-20px_rgba(14,15,16,0.45)] ring-4 ring-surface">
               <Image
                 src={portrait}
                 alt="Dr. Subash Bhola, founder of RE Journal"
@@ -89,7 +89,7 @@ function FounderSpotlight() {
                 className="object-cover object-[50%_12%]"
               />
             </div>
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-line bg-white px-3 py-1.5 text-[12px] font-medium shadow-sm">
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-medium shadow-sm">
               PhD · Economics
             </span>
           </div>

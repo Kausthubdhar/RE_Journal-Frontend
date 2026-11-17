@@ -113,7 +113,7 @@ export default function Reports() {
           <div>
             <SectionHeading eyebrow="Insights" title="Latest research" accent="reports" />
           </div>
-          <a href={LINKS.insights} className="group inline-flex w-fit items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-[14px] font-medium">
+          <a href={LINKS.insights} className="group inline-flex w-fit items-center gap-2 rounded-full border border-line bg-surface px-5 py-2.5 text-[14px] font-medium">
             All insights <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
         </div>
@@ -138,7 +138,7 @@ export default function Reports() {
             <p className="mt-4 max-w-120 text-[16px] leading-relaxed text-muted">{first.body}</p>
             <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-medium">
               Read the report
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-white transition-transform duration-300 group-hover:rotate-45">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-surface transition-transform duration-300 group-hover:rotate-45">
                 <ArrowUpRight className="h-4 w-4" />
               </span>
             </span>

@@ -67,7 +67,7 @@ export default function CTA() {
     <section ref={root} id="contact" className="px-3 py-10 sm:px-5">
       <div
         data-cta-panel
-        className="relative overflow-hidden rounded-[36px] bg-[#0e0f10] px-6 py-24 text-white sm:px-12 sm:py-32"
+        className="relative overflow-hidden rounded-[36px] bg-deep px-6 py-24 text-white sm:px-12 sm:py-32"
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           glowTo.current?.x(e.clientX - r.left);
@@ -89,7 +89,7 @@ export default function CTA() {
             Get access to our premium analytics platform and make data-driven decisions.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Magnetic href={LINKS.signUp} className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-4 text-[15px] font-medium text-ink">
+            <Magnetic href={LINKS.signUp} className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-4 text-[15px] font-medium text-[#0e0f10]">
               Get started <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Magnetic>
             <Magnetic href="mailto:subscription@rejournal.in" className="inline-flex items-center gap-2 rounded-full border border-white/20 px-7 py-4 text-[15px] font-medium text-white hover:bg-white/5">

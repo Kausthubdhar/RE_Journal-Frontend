@@ -116,7 +116,7 @@ export default function MiniPreview({ kind, name, color }: { kind: PreviewKind; 
     const parts = [0.4 + rand() * 0.15, 0.2 + rand() * 0.1, 0.12 + rand() * 0.08];
     const rest = Math.max(0.08, 1 - parts.reduce((a, b) => a + b, 0));
     const all = [...parts, rest];
-    const shades = [color, tint(color, 60), tint(color, 35), "#e7e6e1"];
+    const shades = [color, tint(color, 60), tint(color, 35), "var(--surface-2)"];
     let acc = 0;
     return (
       <svg viewBox="0 0 120 40" {...common}>
@@ -132,7 +132,7 @@ export default function MiniPreview({ kind, name, color }: { kind: PreviewKind; 
         {all.slice(0, 3).map((p, i) => (
           <g key={i} transform={`translate(48 ${8 + i * 12})`} data-prev-fade>
             <rect width="7" height="7" rx="2" fill={shades[i]} />
-            <rect x="12" y="1.5" width={r2(20 + p * 90)} height="4" rx="2" fill="#0e0f10" fillOpacity="0.1" />
+            <rect x="12" y="1.5" width={r2(20 + p * 90)} height="4" rx="2" fill="var(--ink)" fillOpacity="0.1" />
           </g>
         ))}
       </svg>
@@ -145,14 +145,14 @@ export default function MiniPreview({ kind, name, color }: { kind: PreviewKind; 
   const ang = Math.PI * (1 - v);
   return (
     <svg viewBox="0 0 120 40" {...common}>
-      <path d={arc} fill="none" stroke="#e7e6e1" strokeWidth="6" strokeLinecap="round" />
+      <path d={arc} fill="none" stroke="var(--surface-2)" strokeWidth="6" strokeLinecap="round" />
       <path d={arc} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" pathLength={100} strokeDasharray={`${r2(v * 100)} 100`} data-prev-gauge />
-      <line x1="36" y1="36" x2={r2(36 + Math.cos(ang) * 20)} y2={r2(36 - Math.sin(ang) * 20)} stroke="#0e0f10" strokeWidth="2" strokeLinecap="round" data-prev-needle />
-      <circle cx="36" cy="36" r="3" fill="#0e0f10" />
+      <line x1="36" y1="36" x2={r2(36 + Math.cos(ang) * 20)} y2={r2(36 - Math.sin(ang) * 20)} stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" data-prev-needle />
+      <circle cx="36" cy="36" r="3" fill="var(--ink)" />
       <g transform="translate(76 12)" data-prev-fade>
-        <rect width="36" height="5" rx="2.5" fill="#0e0f10" fillOpacity="0.12" />
+        <rect width="36" height="5" rx="2.5" fill="var(--ink)" fillOpacity="0.12" />
         <rect y="11" width="26" height="5" rx="2.5" fill={tint(color, 50)} />
-        <rect y="22" width="31" height="5" rx="2.5" fill="#0e0f10" fillOpacity="0.08" />
+        <rect y="22" width="31" height="5" rx="2.5" fill="var(--ink)" fillOpacity="0.08" />
       </g>
     </svg>
   );

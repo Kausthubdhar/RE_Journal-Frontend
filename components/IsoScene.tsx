@@ -77,10 +77,12 @@ function renderBox(b: Box, ink: string, i: number) {
   const z0 = b.z ?? 0;
   const z1 = z0 + b.h;
   const { x, y, w, d } = b;
-  const base = b.tone ? "#e4e1d8" : mix(ink, "#ffffff", 0.55);
-  const top = b.tone ? "#f4f2ec" : mix(ink, "#ffffff", 0.78);
+  // colours mix with the page surface, so they stay pastel in light mode and dim to dusk in dark mode
+  const onSurface = (t: number) => `color-mix(in srgb, ${ink} ${Math.round((1 - t) * 100)}%, var(--surface))`;
+  const base = b.tone ? "var(--iso-plinth)" : onSurface(0.55);
+  const top = b.tone ? "var(--iso-plinth-top)" : onSurface(0.78);
   const left = base;
-  const right = b.tone ? "#d3cfc4" : mix(ink, "#ffffff", 0.32);
+  const right = b.tone ? "var(--iso-plinth-side)" : onSurface(0.32);
   const glass = mix(ink, "#000000", 0.15);
 
   // side faces: left = the y+d face, right = the x+w face

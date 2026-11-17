@@ -77,7 +77,7 @@ export default function DockTile({ name, icon: Icon, color, preview, onOpen }: P
       onClick={(e) => onOpen(e.currentTarget)}
       onKeyDown={onKeyDown}
       style={{ ["--tile" as string]: color }}
-      className="group relative h-28 w-36 min-w-0 shrink-0 snap-start cursor-pointer overflow-hidden rounded-2xl border border-line bg-white transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 sm:w-auto sm:flex-1 hover:border-[color-mix(in_oklab,var(--tile)_35%,white)] hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--tile)_70%,black)] focus-visible:border-[color-mix(in_oklab,var(--tile)_45%,white)]"
+      className="group relative h-28 w-36 min-w-0 shrink-0 snap-start cursor-pointer overflow-hidden rounded-2xl border border-line bg-surface transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 sm:w-auto sm:flex-1 hover:border-[color-mix(in_oklab,var(--tile)_35%,white)] hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--tile)_70%,black)] focus-visible:border-[color-mix(in_oklab,var(--tile)_45%,white)]"
     >
       {/* cursor spotlight in the app's colour */}
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(180px_circle_at_var(--mx,50%)_var(--my,50%),color-mix(in_oklab,var(--tile)_14%,transparent),transparent_70%)]" />
