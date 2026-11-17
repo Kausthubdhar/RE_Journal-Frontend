@@ -122,7 +122,7 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-export const PROMPTS = [
+export const PROMPTS = [  
   "Office vacancy forecast for Hyderabad, next 5 years",
   "Grade A warehousing supply — Pune vs Chennai",
   "Rental yield trend for BKC, Mumbai",

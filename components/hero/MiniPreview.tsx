@@ -9,7 +9,7 @@ import type { PreviewKind } from "./data";
 const W = 120;
 const H = 40;
 
-function seeded(name: string) {
+export function seeded(name: string) {
   let h = 2166136261;
   for (let i = 0; i < name.length; i++) h = Math.imul(h ^ name.charCodeAt(i), 16777619);
   return () => {

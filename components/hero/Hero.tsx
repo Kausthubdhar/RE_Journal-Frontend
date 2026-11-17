@@ -6,6 +6,7 @@ import { ChevronDown, Plus } from "lucide-react";
 import { CATEGORIES } from "./data";
 import PromptBox from "./PromptBox";
 import DockTile from "./DockTile";
+import DockDetail, { type DetailApp } from "./DockDetail";
 import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from "@/lib/gsap";
 
 const CityScene = dynamic(() => import("./CityScene"), { ssr: false });
@@ -177,8 +178,10 @@ export default function Hero() {
   const [tabFocus, setTabFocus] = useState(false);
   // a dock tile opened by tap or keyboard also holds the rotation (phones have no hover to pause it)
   const [tileFocus, setTileFocus] = useState(false);
+  // the full preview panel opened from a dock tile (holds the rotation while open)
+  const [detail, setDetail] = useState<{ app: DetailApp; from: HTMLElement } | null>(null);
   const [onScreen, setOnScreen] = useState(true);
-  const auto = onScreen && !hovered && !tabFocus && !tileFocus;
+  const auto = onScreen && !hovered && !tabFocus && !tileFocus && !detail;
 
   useEffect(() => {
     let inView = true;
@@ -203,6 +206,7 @@ export default function Hero() {
     if (to === undefined) return;
     e.preventDefault();
     const i = to % n;
+    setDetail(null);
     setIdx(i);
     tabRefs.current[i]?.focus();
   };
@@ -320,9 +324,16 @@ export default function Hero() {
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-3 sm:gap-2.5">
+            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-3 sm:gap-2.5">
               {cat.apps.map((a) => (
-                <DockTile key={cat.key + a.name} name={a.name} icon={a.icon} color={a.color} preview={a.preview} />
+                <DockTile
+                  key={cat.key + a.name}
+                  name={a.name}
+                  icon={a.icon}
+                  color={a.color}
+                  preview={a.preview}
+                  onOpen={(from) => setDetail({ app: a, from })}
+                />
               ))}
               {cat.apps.length % 3 !== 0 && (
                 <div data-app className="flex h-26 min-w-0 cursor-pointer flex-col justify-between rounded-2xl border border-dashed border-black/15 p-3 text-muted transition-colors hover:border-black/30 hover:text-ink sm:h-28 sm:p-3.5">
@@ -334,6 +345,9 @@ export default function Hero() {
                     <div className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.08em]">Build your own</div>
                   </div>
                 </div>
+              )}
+              {detail && (
+                <DockDetail key={detail.app.name} app={detail.app} origin={detail.from} category={cat.label} onClose={() => setDetail(null)} />
               )}
             </div>
           </div>
@@ -361,7 +375,10 @@ export default function Hero() {
                     aria-selected={on}
                     aria-controls="hero-panel"
                     tabIndex={on ? 0 : -1}
-                    onClick={() => setIdx(i)}
+                    onClick={() => {
+                      setDetail(null);
+                      setIdx(i);
+                    }}
                     className={`relative flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 py-1.5 text-[13.5px] transition-all duration-300 ${
                       on ? "bg-white font-medium text-ink shadow-sm" : "text-ink-2 hover:text-ink"
                     }`}

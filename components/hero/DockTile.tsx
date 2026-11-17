@@ -5,18 +5,9 @@ import { ArrowUpRight, type LucideIcon } from "lucide-react";
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import MiniPreview from "./MiniPreview";
 import type { PreviewKind } from "./data";
+import { KIND_LABEL, addChartEntrance } from "./chartAnim";
 
-const KIND_LABEL: Record<PreviewKind, string> = {
-  bars: "Bar chart",
-  stack: "Stacked bars",
-  line: "Trend line",
-  heat: "Heatmap",
-  donut: "Share mix",
-  gauge: "Score gauge",
-  forecast: "Forecast",
-};
-
-type Props = { name: string; icon: LucideIcon; color: string; preview: PreviewKind };
+type Props = { name: string; icon: LucideIcon; color: string; preview: PreviewKind; onOpen: (tile: HTMLElement) => void };
 
 /**
  * Dock app tile. Calm by default (icon, name, what's inside); on hover, keyboard focus or tap it
@@ -24,7 +15,7 @@ type Props = { name: string; icon: LucideIcon; color: string; preview: PreviewKi
  * heat cells ripple, donut sweeps, gauge needle swings). Leaving plays it in reverse.
  * A cursor-following glow in the app's colour sits underneath.
  */
-export default function DockTile({ name, icon: Icon, color, preview }: Props) {
+export default function DockTile({ name, icon: Icon, color, preview, onOpen }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const tl = useRef<gsap.core.Timeline | null>(null);
 
@@ -38,21 +29,7 @@ export default function DockTile({ name, icon: Icon, color, preview }: Props) {
         .fromTo(q("[data-peek]"), { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5 }, 0.12);
 
       // 2. the chart's own entrance
-      const at = 0.2;
-      const bars = q("[data-prev-bar]");
-      if (bars.length) t.from(bars, { scaleY: 0, transformOrigin: "50% 100%", duration: 0.7, stagger: 0.035 }, at);
-      const cells = q("[data-prev-cell]");
-      if (cells.length) t.from(cells, { scale: 0, transformOrigin: "50% 50%", duration: 0.5, stagger: { each: 0.008, grid: [4, 12], from: "center" } }, at);
-      const lines = q("[data-prev-draw]");
-      if (lines.length) t.fromTo(lines, { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.9, ease: "power3.inOut" }, at);
-      const rings = q("[data-prev-ring]");
-      if (rings.length) t.from(rings, { attr: { "stroke-dasharray": "0 100" }, duration: 0.8, stagger: 0.08, ease: "power3.out" }, at);
-      const gauge = q("[data-prev-gauge]");
-      if (gauge.length) t.from(gauge, { attr: { "stroke-dasharray": "0 100" }, duration: 0.9, ease: "power3.out" }, at);
-      const needle = q("[data-prev-needle]");
-      if (needle.length) t.from(needle, { rotation: -150, svgOrigin: "36 36", duration: 1.1, ease: "elastic.out(1, 0.5)" }, at);
-      const fades = q("[data-prev-fade]");
-      if (fades.length) t.from(fades, { autoAlpha: 0, duration: 0.5, stagger: 0.05 }, at + 0.25);
+      addChartEntrance(t, q, 0.2);
 
       tl.current = t;
       return () => t.kill();
@@ -60,33 +37,24 @@ export default function DockTile({ name, icon: Icon, color, preview }: Props) {
     { scope: root },
   );
 
-  const isOpen = useRef(false);
-  const focusedAt = useRef(0);
   const open = () => {
     const t = tl.current;
-    isOpen.current = true;
     if (!t) return;
     if (prefersReducedMotion()) t.progress(1).pause();
     else t.timeScale(1).play();
   };
   const close = () => {
     const t = tl.current;
-    isOpen.current = false;
     if (!t) return;
     if (prefersReducedMotion()) t.progress(0).pause();
     else t.timeScale(1.8).reverse();
   };
-  const onFocus = () => {
-    focusedAt.current = performance.now();
-    open();
-  };
-  // touch screens have no hover: a tap toggles the preview. A tap also focuses the tile, so the
-  // tap that just focused it means "open", not "toggle closed".
-  const onClick = () => {
-    if (!window.matchMedia("(hover: none)").matches) return;
-    if (performance.now() - focusedAt.current < 400) return open();
-    if (isOpen.current) close();
-    else open();
+  // click / tap / Enter / Space opens the full preview panel
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onOpen(e.currentTarget);
+    }
   };
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -100,13 +68,14 @@ export default function DockTile({ name, icon: Icon, color, preview }: Props) {
       data-app
       tabIndex={0}
       role="button"
-      aria-label={`${name}: ${KIND_LABEL[preview].toLowerCase()} preview`}
+      aria-label={`Open ${name} preview (${KIND_LABEL[preview].toLowerCase()})`}
       onPointerEnter={(e) => e.pointerType === "mouse" && open()}
       onPointerLeave={(e) => e.pointerType === "mouse" && close()}
       onPointerMove={onMove}
-      onFocus={onFocus}
+      onFocus={open}
       onBlur={close}
-      onClick={onClick}
+      onClick={(e) => onOpen(e.currentTarget)}
+      onKeyDown={onKeyDown}
       style={{ ["--tile" as string]: color }}
       className="group relative h-26 min-w-0 cursor-pointer overflow-hidden rounded-2xl border border-line bg-white transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tile)_35%,white)] hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--tile)_70%,black)] focus-visible:border-[color-mix(in_oklab,var(--tile)_45%,white)] sm:h-28"
     >
