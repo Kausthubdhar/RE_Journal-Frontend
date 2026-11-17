@@ -7,6 +7,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import gsap from "gsap";
 import { prefersReducedMotion } from "@/lib/gsap";
 import type { SceneKey } from "./data";
+import { NightLife, type WindowGrid } from "./nightLife";
 
 /*
  * Performance notes
@@ -42,6 +43,8 @@ type TexKind = "glass" | "concrete" | "residential" | "storefront" | "corrugated
 type Facade = {
   map: THREE.CanvasTexture;
   em: THREE.CanvasTexture | null;
+  /** lit-window grid of the glow texture, so windows can switch on/off at night */
+  grid: WindowGrid | null;
   tileW: number;
   tileH: number;
   cols: number;
@@ -67,6 +70,7 @@ function gridTex(o: { frame: string; glass: string[]; lit: string; litChance: nu
   const cw = S / o.cols;
   const rh = S / o.rows;
   let anyLit = false;
+  const cells: WindowGrid["cells"] = [];
   for (let y = 0; y < o.rows; y++)
     for (let x = 0; x < o.cols; x++) {
       const lit = r() < o.litChance;
@@ -76,6 +80,7 @@ function gridTex(o: { frame: string; glass: string[]; lit: string; litChance: nu
       const h = rh * (1 - o.gy);
       cx.fillStyle = lit ? o.lit : o.glass[Math.floor(r() * o.glass.length)];
       cx.fillRect(px, py, w, h);
+      cells.push({ x: px, y: py, w, h, on: lit });
       if (lit) {
         anyLit = true;
         ex.fillStyle = o.lit;
@@ -93,13 +98,13 @@ function gridTex(o: { frame: string; glass: string[]; lit: string; litChance: nu
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.anisotropy = 4;
   }
-  return { map, em };
+  return { map, em, grid: em ? { ctx: ex, tex: em, cells, lit: o.lit } : null };
 }
 
 function makeFacades(): Record<TexKind, Facade> {
   const f = (
     tex: Parameters<typeof gridTex>[0],
-    rest: Omit<Facade, "map" | "em" | "cols" | "rows" | "tileW" | "tileH"> & { cellW: number; cellH: number },
+    rest: Omit<Facade, "map" | "em" | "grid" | "cols" | "rows" | "tileW" | "tileH"> & { cellW: number; cellH: number },
   ): Facade => ({
     ...gridTex(tex),
     cols: tex.cols,
@@ -161,6 +166,7 @@ class MatCache {
           metalness: t.metal,
         }),
       );
+      m.userData.facade = true;
       this.map.set(key, m);
     }
     return m;
@@ -733,6 +739,10 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     const facades = makeFacades();
     const mats = makeMats();
 
+    // ambient night life: blinking roof beacons, cars with headlights, windows switching on/off
+    const life = new NightLife(Object.values(facades).flatMap((f) => (f.grid ? [f.grid] : [])));
+    scene.add(life.group);
+
     // ---- day / night: dark mode turns the city into a night scene with glowing windows ----
     const night = { v: 0 };
     const DAY = { sky: new THREE.Color("#ffffff"), ground: new THREE.Color("#d9d4ca"), sun: new THREE.Color("#fff3e2"), fog: new THREE.Color("#f7f7f4"), grid: new THREE.Color("#0e0f10"), pad: new THREE.Color("#ffffff") };
@@ -742,10 +752,10 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     const tuneEmissive = () => {
       scene.traverse((o) => {
         const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
-        if (!m || !("emissiveMap" in m) || !m.emissiveMap) return;
+        if (!m || !m.userData?.facade) return;
         m.userData.baseEm ??= m.emissiveIntensity;
         m.userData.baseColor ??= m.color.clone();
-        m.emissiveIntensity = m.userData.baseEm * lerp(1, 2.6);
+        if (m.emissiveMap) m.emissiveIntensity = m.userData.baseEm * lerp(1, 2.6);
         // walls dim towards a cool dusk tone at night so the lit windows stand out
         m.color.copy(m.userData.baseColor).lerp(NIGHT.wall, night.v * 0.55);
       });
@@ -763,6 +773,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       gridMat.opacity = lerp(0.045, 0.06);
       (pad.material as THREE.MeshBasicMaterial).color.lerpColors(DAY.pad, NIGHT.pad, night.v);
       (catcher.material as THREE.ShadowMaterial).opacity = lerp(0.16, 0.32);
+      life.setNight(night.v);
       tuneEmissive();
     };
     const cache = new MatCache(facades);
@@ -809,6 +820,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       const items = b.group.children;
       b.group.updateMatrixWorld(true);
       sceneBox.setFromObject(b.group);
+      life.rebuild(b.group, sceneBox, performance.now());
       reframe(!!old);
       scene.add(b.group);
       tuneEmissive();
@@ -894,6 +906,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
     let raf = 0;
     let slowFrames = 0;
     let last = performance.now();
+    let lastRender = 0;
 
     const loop = () => {
       raf = requestAnimationFrame(loop);
@@ -914,7 +927,12 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
         if (l.spinners.length) spinning = true;
         l.spinners.forEach((fn) => fn(t));
       });
-      if (!moving && !busy && !spinning && !dirty) return;
+      const ambient = life.active;
+      if (!moving && !busy && !spinning && !dirty && !ambient) return;
+      // night life alone doesn't need 60fps: ~30fps keeps the GPU cool
+      if (ambient && !moving && !busy && !spinning && !dirty && now - lastRender < 33) return;
+      lastRender = now;
+      life.update(t, now);
       dirty = false;
 
       target.set(view.tx, view.ty, view.tz);
@@ -945,6 +963,7 @@ export default function CityScene({ active, onReady }: { active: SceneKey; onRea
       cancelAnimationFrame(raf);
       viewTween?.kill();
       themeObserver.disconnect();
+      life.dispose();
       gsap.killTweensOf(night);
       ro.disconnect();
       io.disconnect();
