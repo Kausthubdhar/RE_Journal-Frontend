@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { INDEXABLE, LIVE_SITE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
@@ -66,10 +65,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${serif.variable} antialiased`}
     >
+      <head>
+        {/* plain inline script in <head>: runs before first paint (next/script defers inline code until hydration) */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="min-h-full">
-        <Script id="theme" strategy="beforeInteractive">
-          {THEME_SCRIPT}
-        </Script>
         <a
           href="#main"
           className="fixed left-3 top-3 z-100 -translate-y-16 rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-surface transition-transform focus:translate-y-0"
